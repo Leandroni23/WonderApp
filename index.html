@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>WonderSync Global 8.3</title>
+    <style>
+        :root { --main: #e94560; --bg: #050510; --card: rgba(22, 33, 62, 0.8); --input: #0f0f20; --money: #00ff88; --fail: #ff4d4d; }
+        body { background: var(--bg); color: white; font-family: 'Segoe UI', sans-serif; margin: 0; overflow-x: hidden; }
+        .app-header { background: rgba(15, 52, 96, 0.95); backdrop-filter: blur(15px); padding: 25px; text-align: center; border-bottom: 2px solid var(--main); position: sticky; top: 0; z-index: 1000; }
+        .back-btn { position: absolute; left: 20px; top: 22px; font-size: 1.5rem; cursor: pointer; display: none; background: rgba(255,255,255,0.1); width: 40px; height: 40px; border-radius: 50%; line-height: 38px; text-align: center; }
+        #mainMenu { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding: 15px; }
+        .menu-item { background: var(--card); padding: 25px 10px; border-radius: 20px; text-align: center; border: 1px solid rgba(255,255,255,0.05); }
+        .menu-item:active { background: var(--main); transform: scale(0.95); }
+        .menu-icon { font-size: 2rem; display: block; margin-bottom: 5px; }
+        .menu-lbl { font-weight: 800; font-size: 0.65rem; text-transform: uppercase; letter-spacing: 1px; }
+        .section { display: none; padding: 15px; animation: fadeIn 0.3s ease; }
+        .section.active { display: block; }
+        .dash-card { background: var(--card); border-radius: 20px; padding: 20px; margin-bottom: 15px; border: 1px solid rgba(255,255,255,0.1); }
+        input, select { width: 100%; padding: 15px; border-radius: 12px; border: none; background: var(--input); color: white; margin-bottom: 10px; font-size: 1rem; box-sizing: border-box; }
+        label { font-size: 0.6rem; color: var(--main); font-weight: 900; text-transform: uppercase; margin: 5px; display: block; }
+        .action-btn { background: var(--main); color: white; border: none; padding: 18px; border-radius: 15px; width: 100%; font-weight: 900; }
+        .pantry-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .cat-title { font-size: 0.8rem; font-weight: 900; color: var(--main); margin: 20px 0 10px 10px; letter-spacing: 2px; border-left: 3px solid var(--main); padding-left: 10px; }
+        .color-dot { width: 30px; height: 30px; border-radius: 50%; margin: 0 auto 10px; border: 2px solid white; }
+        .fuel-bg { background: var(--input); height: 10px; border-radius: 5px; position: relative; overflow: hidden; margin-top: 10px; }
+        .fuel-fill { height: 100%; transition: width 0.8s; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    </style>
+</head>
+<body>
+
+    <div class="app-header">
+        <span id="backBtn" class="back-btn" onclick="showMenu()">‹</span>
+        <div id="appTitle" style="font-size: 1.2rem; font-weight: 900; letter-spacing: 3px;">WONDERSYNC <span style="color:var(--main)">GLOBAL</span></div>
+    </div>
+
+    <div id="mainMenu">
+        <div class="menu-item" onclick="openSection('service', 'LIVE JOB')"><span class="menu-icon">🚀</span><span class="menu-lbl">Live Job</span></div>
+        <div class="menu-item" onclick="openSection('distributors', 'SHOPS')"><span class="menu-icon">🏪</span><span class="menu-lbl">Shops</span></div>
+        <div class="menu-item" onclick="openSection('pantry', 'WAREHOUSE')"><span class="menu-icon">📦</span><span class="menu-lbl">Warehouse</span></div>
+        <div class="menu-item" onclick="openSection('workshop', 'WORKSHOP')"><span class="menu-icon">⚙️</span><span class="menu-lbl">Workshop</span></div>
+        <div class="menu-item" onclick="openSection('library', 'LIBRARY')"><span class="menu-icon">📚</span><span class="menu-lbl">Library</span></div>
+        <div class="menu-item" onclick="openSection('orders', 'ORDERS')"><span class="menu-icon">🛒</span><span class="menu-lbl">Orders</span></div>
+    </div>
+
+    <div id="service" class="section">
+        <div id="dashProfit" style="text-align:center; font-size:2.2rem; font-weight:900; color:var(--money); margin-bottom:10px;">€0.00</div>
+        <div id="recipeGrid" style="display:flex; overflow-x:auto; gap:12px; padding:10px 0;"></div>
+        <div class="dash-card">
+            <label>Project Name</label><input type="text" id="printName">
+            <label>Printer</label><select id="printerSelect"></select>
+            <div style="display:flex; gap:10px;">
+                <div style="flex:1;"><label>Qty</label><input type="number" id="printQty" value="1" oninput="finalCalc()"></div>
+                <div style="flex:1;"><label>Hrs</label><input type="number" id="timeH" oninput="finalCalc()"></div>
+                <div style="flex:1;"><label>Min</label><input type="number" id="timeM" oninput="finalCalc()"></div>
+            </div>
+            <label>Destination</label><select id="destSelect"></select>
+            <div id="suggestedTotal" style="text-align:center; color:var(--money); font-weight:bold; margin:15px 0;">Target: €0.00</div>
+            <input type="number" id="finalSalePrice" placeholder="€ Unit Price" style="text-align:center; font-size:1.5rem; border:1px solid var(--money);" oninput="finalCalc()">
+            <div id="realProfitUnit" style="text-align:center; font-weight:900; margin-top:5px; color:var(--money);">Net Profit: €0.00</div>
+            <button class="action-btn" style="margin-top:10px;" onclick="finalizeJob()">FINALIZE & DEPLOY</button>
+        </div>
+    </div>
+
+    <div id="distributors" class="section">
+        <div class="dash-card">
+            <label>New Shop Name</label><input type="text" id="newLocName">
+            <label>Commission %</label><input type="number" id="newLocComm" value="10">
+            <button class="action-btn" onclick="createNewLocation()">+ ADD SHOP</button>
+        </div>
+        <div id="locationList"></div>
+    </div>
+
+    <div id="pantry" class="section">
+        <div class="dash-card">
+            <label>Name</label><input type="text" id="invName">
+            <label>Type</label><select id="invCat">
+                <option value="PLA">PLA</option><option value="TPU">TPU</option>
+                <option value="ABS">ABS/ASA</option><option value="PARTS">Hardware/Parts</option>
+            </select>
+            <div style="display:flex; gap:10px;">
+                <div style="flex:1;"><label id="stockLabel">Grams</label><input type="number" id="invStock"></div>
+                <div style="flex:1;"><label>Cost €</label><input type="number" id="invPrice"></div>
+            </div>
+            <button class="action-btn" onclick="addNewMaterial()">REGISTER STOCK</button>
+        </div>
+        <div id="warehouseDisplay"></div>
+    </div>
+
+    <div id="workshop" class="section"><div id="printerDisplay"></div></div>
+
+    <div id="library" class="section">
+        <div class="dash-card" style="border: 1px dashed var(--main);">
+            <label>Recipe Name</label><input type="text" id="recName">
+            <label>Ingredients</label>
+            <div style="display:flex; gap:5px;"><select id="recMatSelect"></select><input type="number" id="recWeight" placeholder="g" style="width:80px;"><button onclick="addToBasket()" style="background:var(--main); color:white; border:none; border-radius:10px; padding:0 15px;">+</button></div>
+            <div id="basketDisplay" style="margin:10px 0; font-size:0.7rem; color:var(--money);"></div>
+            <button class="action-btn" onclick="saveRecipe()">SAVE TO LIBRARY</button>
+        </div>
+        <div id="libraryList"></div>
+    </div>
+
+    <div id="orders" class="section"><div class="dash-card"><h3>Order Tracking</h3><p>Tracking incoming filament & parts.</p></div></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        const SUPABASE_URL = 'https://yeiqourfbdormfeprvgq.supabase.co';
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InllaXFvdXJmYmRvcm1mZXBydmdxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU2ODM1NTcsImV4cCI6MjA5MTI1OTU1N30.UWLPlGfNquzDYWow85CEztwpEMM9sgHlEeQLLPjRrdc'; 
+        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+        let materials = [], recipes = [], printers = [], locations = [], jobMaterials = [], basket = [];
+
+        function getColor(name) {
+            const n = name.toLowerCase();
+            if(n.includes('red')) return '#ff4d4d'; if(n.includes('green')) return '#00ff88';
+            if(n.includes('blue')) return '#3498db'; if(n.includes('pink')) return '#ff69b4';
+            if(n.includes('white')) return '#ffffff'; if(n.includes('black')) return '#1a1a1a';
+            if(n.includes('grey') || n.includes('gray')) return '#7f8c8d';
+            return '#e94560';
+        }
+
+        async function loadAll() {
+            const { data: inv } = await supabaseClient.from('Inventory').select('*');
+            const { data: hist } = await supabaseClient.from('History').select('*').order('created_at', { ascending: false });
+            const { data: rec } = await supabaseClient.from('Recipes').select('*');
+            const { data: prn } = await supabaseClient.from('Printers').select('*');
+            const { data: loc } = await supabaseClient.from('Locations').select('*');
+            materials = inv; recipes = rec; printers = prn; locations = loc;
+
+            // Balance
+            let total = 0; hist.forEach(h => total += h.profit);
+            document.getElementById('dashProfit').innerText = "€" + total.toFixed(2);
+
+            // Warehouse
+            const wD = document.getElementById('warehouseDisplay'); wD.innerHTML = "";
+            ["PLA", "TPU", "ABS", "PARTS"].forEach(c => {
+                const filtered = inv.filter(m => m.category === c);
+                if(filtered.length > 0) {
+                    wD.innerHTML += `<div class="cat-title">${c}</div><div class="pantry-grid">` + 
+                    filtered.map(m => {
+                        const isP = (m.category === "PARTS");
+                        return `<div class="dash-card" style="padding:15px; margin-bottom:0; text-align:center;">
+                            ${isP ? '⚙️' : `<div class="color-dot" style="background:${getColor(m.name)}"></div>`}
+                            <div style="font-size:0.7rem; font-weight:bold;">${m.name}</div>
+                            <div style="font-weight:900; color:var(--money);">${m.stock_g}${isP ? ' units' : 'g'}</div>
+                            ${isP ? '' : `<div class="fuel-bg"><div class="fuel-fill" style="width:${(m.stock_g/1000)*100}%; background:${getColor(m.name)}"></div></div>`}
+                        </div>`;
+                    }).join("") + `</div>`;
+                }
+            });
+
+            // Shops
+            const lD = document.getElementById('locationList'); lD.innerHTML = "";
+            loc.forEach(l => {
+                let items = ""; if(l.inventory) { for(let [k,v] of Object.entries(l.inventory)) { if(v > 0) items += `<div style="display:flex; justify-content:space-between; margin-top:5px;"><span>${k} (x${v})</span><button onclick="sellFromStock(${l.id},'${k}')" style="background:var(--money); border:none; border-radius:5px; font-weight:bold; padding:2px 10px;">SELL</button></div>`; } }
+                lD.innerHTML += `<div class="dash-card"><b>${l.name}</b> (${l.commission}%) ${items || "<br><small>No Stock</small>"}</div>`;
+            });
+
+            // Library
+            const libD = document.getElementById('libraryList'); libD.innerHTML = "";
+            rec.forEach(r => libD.innerHTML += `<div class="dash-card">💎 <b>${r.name}</b></div>`);
+
+            // Workshop
+            const workD = document.getElementById('printerDisplay'); workD.innerHTML = "";
+            prn.forEach(p => workD.innerHTML += `<div class="dash-card"><b>${p.name}</b><br>Runtime: ${p.total_hours.toFixed(1)}h</div>`);
+
+            // Dropdowns
+            const rG = document.getElementById('recipeGrid'); rG.innerHTML = "";
+            rec.forEach(r => { rG.innerHTML += `<div onclick="loadRecipeById(${r.id})" class="menu-item" style="min-width:80px; padding:10px;">🏗️<br><small>${r.name}</small></div>`; });
+            const pS = document.getElementById('printerSelect'); pS.innerHTML = "";
+            prn.forEach(p => pS.innerHTML += `<option value="${p.id}">${p.name}</option>`);
+            const dS = document.getElementById('destSelect'); dS.innerHTML = '<option value="direct">Direct Sale</option>';
+            loc.forEach(l => dS.innerHTML += `<option value="${l.id}">STOCK: ${l.name}</option>`);
+            const mS = document.getElementById('recMatSelect'); mS.innerHTML = "";
+            inv.forEach(m => mS.innerHTML += `<option value="${m.id}">${m.name}</option>`);
+        }
+
+        function openSection(id, title) {
+            document.getElementById('mainMenu').style.display = 'none';
+            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+            document.getElementById('appTitle').innerHTML = `WONDERSYNC <span style="color:var(--main)">${title}</span>`;
+            document.getElementById('backBtn').style.display = 'block';
+        }
+
+        function showMenu() {
+            document.getElementById('mainMenu').style.display = 'grid';
+            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+            document.getElementById('appTitle').innerHTML = `WONDERSYNC <span style="color:var(--main)">GLOBAL</span>`;
+            document.getElementById('backBtn').style.display = 'none';
+        }
+
+        function addToBasket() {
+            const id = document.getElementById('recMatSelect').value;
+            const w = parseFloat(document.getElementById('recWeight').value);
+            const m = materials.find(x => x.id == id);
+            basket.push({ id: m.id, name: m.name, weight: w, costPerG: (m.price_paid/1000) });
+            document.getElementById('basketDisplay').innerText = basket.map(b => b.name).join(", ");
+        }
+
+        async function saveRecipe() {
+            const n = document.getElementById('recName').value;
+            await supabaseClient.from('Recipes').insert([{ name: n, ingredients: basket, default_time_h: 0, default_time_m: 0 }]);
+            basket = []; location.reload();
+        }
+
+        async function addNewMaterial() {
+            const name = document.getElementById('invName').value;
+            const cat = document.getElementById('invCat').value;
+            const stock = document.getElementById('invStock').value;
+            const price = document.getElementById('invPrice').value;
+            await supabaseClient.from('Inventory').insert([{ name, category: cat, stock_g: stock, price_paid: price }]);
+            location.reload();
+        }
+
+        async function createNewLocation() {
+            const n = document.getElementById('newLocName').value;
+            const c = document.getElementById('newLocComm').value;
+            await supabaseClient.from('Locations').insert([{ name: n, commission: c, inventory: {} }]);
+            location.reload();
+        }
+
+        function loadRecipeById(id) {
+            const r = recipes.find(x => x.id == id);
+            document.getElementById('printName').value = r.name;
+            jobMaterials = r.ingredients;
+            finalCalc();
+        }
+
+        function finalCalc() {
+            let mC = 0; const q = parseFloat(document.getElementById('printQty').value) || 1;
+            jobMaterials.forEach(m => mC += m.weight * m.costPerG);
+            const hrs = (parseFloat(document.getElementById('timeH').value) || 0) + ((parseFloat(document.getElementById('timeM').value) || 0) / 60);
+            const totalC = mC + hrs;
+            const sug = (mC * 3) + hrs;
+            document.getElementById('suggestedTotal').innerText = "Target: €" + sug.toFixed(2);
+            const sale = parseFloat(document.getElementById('finalSalePrice').value) || 0;
+            const prof = (sale * q) - totalC;
+            document.getElementById('realProfitUnit').innerText = "Net Profit: €" + prof.toFixed(2);
+            return { totalC, hrs };
+        }
+
+        async function finalizeJob() {
+            const c = finalCalc(); const dest = document.getElementById('destSelect').value;
+            const pId = document.getElementById('printerSelect').value;
+            const printer = printers.find(p => p.id == pId);
+            const qty = parseInt(document.getElementById('printQty').value);
+            const itemName = document.getElementById('printName').value;
+            for (let item of jobMaterials) {
+                const m = materials.find(x => x.id == item.id);
+                await supabaseClient.from('Inventory').update({ stock_g: m.stock_g - item.weight }).eq('id', item.id);
+            }
+            await supabaseClient.from('Printers').update({ total_hours: printer.total_hours + c.hrs }).eq('id', pId);
+            if(dest === 'direct') {
+                await supabaseClient.from('History').insert([{ print_name: itemName + ` (x${qty})`, profit: parseFloat(document.getElementById('realProfitUnit').innerText.replace('Net Profit: €','')), cost: c.totalC, printer_name: printer.name }]);
+            } else {
+                const loc = locations.find(l => l.id == dest);
+                let inv = loc.inventory || {}; inv[itemName] = (inv[itemName] || 0) + qty;
+                await supabaseClient.from('Locations').update({ inventory: inv }).eq('id', dest);
+                await supabaseClient.from('History').insert([{ print_name: `📦 -> ${loc.name}`, profit: -c.totalC, cost: c.totalC, printer_name: printer.name }]);
+            }
+            location.reload();
+        }
+
+        async function sellFromStock(locId, name) {
+            const loc = locations.find(l => l.id == locId);
+            const salePrice = prompt("Price sold?", "2.50");
+            const profit = parseFloat(salePrice) - (parseFloat(salePrice) * (loc.commission/100));
+            let inv = loc.inventory; inv[name] -= 1;
+            await supabaseClient.from('Locations').update({ inventory: inv }).eq('id', locId);
+            await supabaseClient.from('History').insert([{ print_name: `💰 ${loc.name} Sale`, profit: profit, cost: 0, printer_name: 'Shop' }]);
+            location.reload();
+        }
+
+        loadAll();
+    </script>
+</body>
+</html>
