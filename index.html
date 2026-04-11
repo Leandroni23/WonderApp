@@ -2,33 +2,32 @@
 <html>
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>WonderSync Global 8.6</title>
+    <title>WonderSync 8.7</title>
     <link rel="manifest" href="manifest.json">
     <style>
         :root { --main: #e94560; --bg: #050510; --card: rgba(22, 33, 62, 0.8); --input: #0f0f20; --money: #00ff88; }
-        body { background: var(--bg); color: white; font-family: 'Segoe UI', sans-serif; margin: 0; padding-bottom: 50px; }
-        .app-header { background: rgba(15, 52, 96, 0.95); padding: 20px; text-align: center; border-bottom: 2px solid var(--main); position: sticky; top: 0; z-index: 1000; }
-        .back-btn { position: absolute; left: 20px; top: 18px; font-size: 1.5rem; cursor: pointer; display: none; }
-        #mainMenu { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding: 15px; }
-        .menu-item { background: var(--card); padding: 25px 10px; border-radius: 20px; text-align: center; border: 1px solid rgba(255,255,255,0.05); cursor: pointer; }
-        .menu-item:hover { background: var(--main); }
-        .menu-icon { font-size: 2rem; display: block; }
-        .menu-lbl { font-weight: 800; font-size: 0.7rem; text-transform: uppercase; }
+        body { background: var(--bg); color: white; font-family: 'Segoe UI', sans-serif; margin: 0; padding-bottom: 80px; }
+        .app-header { background: rgba(15, 52, 96, 0.95); padding: 25px; text-align: center; border-bottom: 2px solid var(--main); position: sticky; top: 0; z-index: 1000; backdrop-filter: blur(10px); }
+        .back-btn { position: absolute; left: 20px; top: 22px; font-size: 1.8rem; cursor: pointer; display: none; color: var(--main); }
+        #mainMenu { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; padding: 20px; }
+        .menu-item { background: var(--card); padding: 30px 10px; border-radius: 25px; text-align: center; border: 1px solid rgba(255,255,255,0.05); }
+        .menu-icon { font-size: 2.5rem; display: block; margin-bottom: 10px; }
+        .menu-lbl { font-weight: 900; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; }
         .section { display: none; padding: 15px; animation: fadeIn 0.3s ease; }
         .section.active { display: block; }
         .dash-card { background: var(--card); border-radius: 20px; padding: 20px; margin-bottom: 15px; border: 1px solid rgba(255,255,255,0.1); }
-        input, select { width: 100%; padding: 12px; border-radius: 10px; border: none; background: var(--input); color: white; margin-bottom: 10px; }
-        label { font-size: 0.6rem; color: var(--main); font-weight: 900; text-transform: uppercase; margin-left: 5px; }
-        .action-btn { background: var(--main); color: white; border: none; padding: 15px; border-radius: 12px; width: 100%; font-weight: 900; cursor: pointer; }
-        .shop-inv-item { display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.3); padding: 10px; border-radius: 10px; margin-bottom: 8px; border-left: 3px solid var(--money); }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        input, select { width: 100%; padding: 15px; border-radius: 12px; border: none; background: var(--input); color: white; margin-bottom: 12px; font-size: 1rem; }
+        label { font-size: 0.65rem; color: var(--main); font-weight: 900; text-transform: uppercase; margin: 0 0 5px 5px; display: block; }
+        .action-btn { background: var(--main); color: white; border: none; padding: 18px; border-radius: 15px; width: 100%; font-weight: 900; cursor: pointer; }
+        .shop-inv-item { display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.4); padding: 12px; border-radius: 12px; margin-bottom: 8px; border-left: 4px solid var(--money); }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 <body>
 
     <div class="app-header">
         <span id="backBtn" class="back-btn" onclick="showMenu()">‹</span>
-        <div id="appTitle" style="font-weight: 900; letter-spacing: 2px;">WONDERSYNC <span style="color:var(--main)">GLOBAL</span></div>
+        <div id="appTitle" style="font-weight: 900; letter-spacing: 3px; font-size: 1.1rem;">WS <span style="color:var(--main)">8.7 ACTIVE</span></div>
     </div>
 
     <div id="mainMenu">
@@ -40,15 +39,14 @@
 
     <div id="pantry" class="section">
         <div class="dash-card">
-            <label>Item Name</label><input type="text" id="invName" placeholder="e.g., WL Keychain">
+            <label>Item Name</label><input type="text" id="invName">
             <label>Category</label>
             <select id="invCat">
-                <option value="FINISHED">Finished Product (Ready to Sell)</option>
-                <option value="PLA">Raw Filament (Grams)</option>
-                <option value="PARTS">Components</option>
+                <option value="FINISHED">Finished Product</option>
+                <option value="PLA">Raw Filament</option>
             </select>
-            <label>Initial Stock</label><input type="number" id="invStock" placeholder="0">
-            <button class="action-btn" onclick="addNewMaterial()">ADD TO GLOBAL PANTRY</button>
+            <label>Stock</label><input type="number" id="invStock">
+            <button class="action-btn" onclick="addNewMaterial()">Add to Pantry</button>
         </div>
         <div id="warehouseDisplay"></div>
     </div>
@@ -58,9 +56,9 @@
     </div>
 
     <div id="service" class="section">
-        <div id="dashProfit" style="text-align:center; font-size:2rem; font-weight:900; color:var(--money); margin-bottom:20px;">€0.00</div>
-        <div class="dash-card">
-            <p style="text-align:center; opacity:0.6;">Ready for the next print job.</p>
+        <div class="dash-card" style="text-align:center;">
+            <label>Total Profit</label>
+            <div id="dashProfit" style="font-size:3rem; font-weight:900; color:var(--money);">€0.00</div>
         </div>
     </div>
 
@@ -76,21 +74,19 @@
             const { data: inv } = await supabaseClient.from('Inventory').select('*');
             const { data: loc } = await supabaseClient.from('Locations').select('*');
             const { data: hist } = await supabaseClient.from('History').select('*');
+            if(!inv || !loc) return; 
             materials = inv; locations = loc;
 
-            // Update Global Profit
             let profit = 0; hist.forEach(h => profit += h.profit);
             document.getElementById('dashProfit').innerText = "€" + profit.toFixed(2);
 
-            // Render Warehouse
             const wD = document.getElementById('warehouseDisplay'); wD.innerHTML = "";
             inv.forEach(m => {
-                wD.innerHTML += `<div class="dash-card" style="padding:10px; display:flex; justify-content:space-between;">
-                    <span>${m.name}</span><b>${m.stock_g} ${m.category==='PLA'?'g':'units'}</b>
+                wD.innerHTML += `<div class="dash-card" style="display:flex; justify-content:space-between;">
+                    <b>${m.name}</b> <span>${m.stock_g} pcs</span>
                 </div>`;
             });
 
-            // Render Shops (Intuitive Dispatcher)
             const lD = document.getElementById('locationList'); lD.innerHTML = "";
             loc.forEach(l => {
                 let stockItems = "";
@@ -99,27 +95,19 @@
                         if(qty > 0) stockItems += `
                             <div class="shop-inv-item">
                                 <span>${name} (x${qty})</span>
-                                <button onclick="sellItem('${l.id}', '${name}')" style="background:var(--money); border:none; padding:5px 12px; border-radius:8px; font-weight:900;">SELL</button>
+                                <button onclick="sellItem('${l.id}', '${name}')" style="background:var(--money); border:none; padding:5px 10px; border-radius:8px; font-weight:bold;">SELL</button>
                             </div>`;
                     }
                 }
-
-                lD.innerHTML += `
-                <div class="dash-card">
-                    <div style="display:flex; justify-content:space-between; margin-bottom:15px;">
-                        <b style="font-size:1.1rem;">🏪 ${l.name}</b>
-                        <span style="color:var(--main); font-weight:bold;">${l.commission}% Fee</span>
-                    </div>
-                    <div id="items-${l.id}">${stockItems || "<small style='opacity:0.4'>No stock here yet.</small>"}</div>
+                lD.innerHTML += `<div class="dash-card">
+                    <b>🏪 ${l.name}</b><br><br>
+                    ${stockItems || "No stock."}
                     <hr style="opacity:0.1; margin:15px 0;">
-                    <label>Quick Dispatch From Pantry</label>
-                    <div style="display:flex; gap:8px;">
-                        <select id="sel-${l.id}" style="margin:0;">
-                            ${materials.filter(m=>m.category==='FINISHED').map(m=>`<option value="${m.id}">${m.name} (${m.stock_g} at home)</option>`).join("")}
-                        </select>
-                        <input type="number" id="qty-${l.id}" placeholder="Qty" style="width:70px; margin:0;">
-                        <button onclick="dispatch('${l.id}')" style="background:var(--main); color:white; border:none; padding:0 15px; border-radius:10px; font-weight:900;">+</button>
-                    </div>
+                    <select id="sel-${l.id}">
+                        ${materials.filter(m=>m.category==='FINISHED').map(m=>`<option value="${m.id}">${m.name} (${m.stock_g} home)</option>`).join("")}
+                    </select>
+                    <input type="number" id="qty-${l.id}" placeholder="Qty" style="width:60px;">
+                    <button onclick="dispatch('${l.id}')" style="background:var(--main); color:white; border:none; border-radius:10px; padding:10px;">ADD</button>
                 </div>`;
             });
         }
@@ -127,35 +115,23 @@
         async function dispatch(locId) {
             const itemId = document.getElementById(`sel-${locId}`).value;
             const qty = parseInt(document.getElementById(`qty-${locId}`).value);
-            if(!qty || qty <= 0) return;
-
             const item = materials.find(m => m.id == itemId);
             const loc = locations.find(l => l.id == locId);
-
-            if(item.stock_g < qty) return alert("Not enough in your home pantry!");
-
-            // Subtract from Home
             await supabaseClient.from('Inventory').update({ stock_g: item.stock_g - qty }).eq('id', itemId);
-            // Add to Shop
-            let inv = loc.inventory || {};
-            inv[item.name] = (inv[item.name] || 0) + qty;
+            let inv = loc.inventory || {}; inv[item.name] = (inv[item.name] || 0) + qty;
             await supabaseClient.from('Locations').update({ inventory: inv }).eq('id', locId);
-            
-            location.reload();
+            loadAll();
         }
 
         async function sellItem(locId, itemName) {
             const loc = locations.find(l => l.id == locId);
-            const price = prompt(`Price sold at ${loc.name}?`, "5.00");
+            const price = prompt(`Sale Price?`, "5.00");
             if(!price) return;
-
-            let inv = loc.inventory;
-            inv[itemName] -= 1;
+            let inv = loc.inventory; inv[itemName] -= 1;
             const profit = parseFloat(price) * (1 - (loc.commission/100));
-
             await supabaseClient.from('Locations').update({ inventory: inv }).eq('id', locId);
-            await supabaseClient.from('History').insert([{ print_name: `Sale: ${itemName} @ ${loc.name}`, profit: profit }]);
-            location.reload();
+            await supabaseClient.from('History').insert([{ print_name: `Sale: ${itemName}`, profit: profit }]);
+            loadAll();
         }
 
         async function addNewMaterial() {
@@ -163,20 +139,20 @@
             const cat = document.getElementById('invCat').value;
             const stock = document.getElementById('invStock').value;
             await supabaseClient.from('Inventory').insert([{ name, category: cat, stock_g: stock, price_paid: 0 }]);
-            location.reload();
+            loadAll();
         }
 
         function openSection(id, title) {
             document.getElementById('mainMenu').style.display = 'none';
             document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
             document.getElementById(id).classList.add('active');
-            document.getElementById('appTitle').innerHTML = `WONDERSYNC <span style="color:var(--main)">${title}</span>`;
+            document.getElementById('appTitle').innerHTML = `WS ${title}`;
             document.getElementById('backBtn').style.display = 'block';
         }
         function showMenu() {
             document.getElementById('mainMenu').style.display = 'grid';
             document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
-            document.getElementById('appTitle').innerHTML = `WONDERSYNC <span style="color:var(--main)">GLOBAL</span>`;
+            document.getElementById('appTitle').innerHTML = `WS 8.7 ACTIVE`;
             document.getElementById('backBtn').style.display = 'none';
         }
         loadAll();
