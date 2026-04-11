@@ -3,33 +3,21 @@
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>WonderSync Pro</title>
-    <link rel="manifest" href="manifest.json">
     <style>
         :root { --main: #e94560; --bg: #050510; --card: rgba(22, 33, 62, 0.8); --input: #0f0f20; --money: #00ff88; }
         body { background: var(--bg); color: white; font-family: 'Segoe UI', sans-serif; margin: 0; padding-bottom: 80px; }
-        .app-header { background: rgba(15, 52, 96, 0.95); padding: 25px; text-align: center; border-bottom: 2px solid var(--main); position: sticky; top: 0; z-index: 1000; backdrop-filter: blur(10px); }
+        .app-header { background: rgba(15, 52, 96, 0.95); padding: 25px; text-align: center; border-bottom: 2px solid var(--main); position: sticky; top: 0; z-index: 1000; }
         .back-btn { position: absolute; left: 20px; top: 22px; font-size: 1.8rem; cursor: pointer; display: none; color: var(--main); }
-        
-        /* Menu Grid */
         #mainMenu { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding: 15px; }
-        .menu-item { background: var(--card); padding: 25px 10px; border-radius: 20px; text-align: center; border: 1px solid rgba(255,255,255,0.05); cursor: pointer; }
-        .menu-icon { font-size: 2rem; display: block; margin-bottom: 8px; }
-        .menu-lbl { font-weight: 900; font-size: 0.65rem; text-transform: uppercase; letter-spacing: 1px; }
-
-        /* Content Sections */
+        .menu-item { background: var(--card); padding: 25px 10px; border-radius: 20px; text-align: center; border: 1px solid rgba(255,255,255,0.05); }
         .section { display: none; padding: 15px; animation: fadeIn 0.3s ease; }
         .section.active { display: block; }
         .dash-card { background: var(--card); border-radius: 20px; padding: 20px; margin-bottom: 15px; border: 1px solid rgba(255,255,255,0.1); }
-        
-        /* Forms */
         input, select { width: 100%; padding: 15px; border-radius: 12px; border: none; background: var(--input); color: white; margin-bottom: 12px; font-size: 1rem; box-sizing: border-box; }
-        label { font-size: 0.65rem; color: var(--main); font-weight: 900; text-transform: uppercase; margin: 0 0 5px 5px; display: block; }
+        label { font-size: 0.65rem; color: var(--main); font-weight: 900; text-transform: uppercase; margin-bottom: 5px; display: block; }
         .action-btn { background: var(--main); color: white; border: none; padding: 18px; border-radius: 15px; width: 100%; font-weight: 900; cursor: pointer; }
-        
-        /* Printer Specifics */
         .progress-bg { background: var(--input); height: 12px; border-radius: 6px; overflow: hidden; margin: 10px 0; }
         .progress-fill { height: 100%; transition: width 0.5s ease; }
-
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
@@ -37,100 +25,108 @@
 
     <div class="app-header">
         <span id="backBtn" class="back-btn" onclick="showMenu()">‹</span>
-        <div id="appTitle" style="font-weight: 900; letter-spacing: 3px; font-size: 1.1rem;">WS <span style="color:var(--main)">WONDERSYNC</span></div>
+        <div id="appTitle" style="font-weight: 900; letter-spacing: 3px;">WONDERSYNC <span style="color:var(--main)">PRO</span></div>
     </div>
 
     <div id="mainMenu">
-        <div class="menu-item" onclick="openSection('distributors', 'SHOPS')"><span class="menu-icon">🏪</span><span class="menu-lbl">Shops</span></div>
-        <div class="menu-item" onclick="openSection('pantry', 'WAREHOUSE')"><span class="menu-icon">📦</span><span class="menu-lbl">Warehouse</span></div>
-        <div class="menu-item" onclick="openSection('suppliers', 'SUPPLIERS')"><span class="menu-icon">🚚</span><span class="menu-lbl">Suppliers</span></div>
-        <div class="menu-item" onclick="openSection('library', 'LIBRARY')"><span class="menu-icon">📚</span><span class="menu-lbl">Library</span></div>
-        <div class="menu-item" onclick="openSection('workshop', 'PRINTERS')"><span class="menu-icon">⚙️</span><span class="menu-lbl">Printers</span></div>
-        <div class="menu-item" onclick="openSection('orders', 'ORDERS')"><span class="menu-icon">🛒</span><span class="menu-lbl">Orders</span></div>
+        <div class="menu-item" onclick="openSection('distributors', 'SHOPS')"><span style="font-size:2rem;display:block;">🏪</span>SHOPS</div>
+        <div class="menu-item" onclick="openSection('pantry', 'WAREHOUSE')"><span style="font-size:2rem;display:block;">📦</span>WAREHOUSE</div>
+        <div class="menu-item" onclick="openSection('suppliers', 'SUPPLIERS')"><span style="font-size:2rem;display:block;">🚚</span>SUPPLIERS</div>
+        <div class="menu-item" onclick="openSection('workshop', 'PRINTERS')"><span style="font-size:2rem;display:block;">⚙️</span>PRINTERS</div>
+        <div class="menu-item" onclick="openSection('library', 'LIBRARY')"><span style="font-size:2rem;display:block;">📚</span>LIBRARY</div>
+        <div class="menu-item" onclick="openSection('orders', 'ORDERS')"><span style="font-size:2rem;display:block;">🛒</span>ORDERS</div>
     </div>
 
     <div id="workshop" class="section">
         <div class="dash-card">
-            <label>Printer Name</label><input type="text" id="pName" placeholder="e.g. Ender 3">
+            <label>Printer Name</label><input type="text" id="pName" placeholder="Wonder 1.0">
             <label>Service Every (Hours)</label><input type="number" id="pService" value="200">
             <button class="action-btn" onclick="addPrinter()">Register Printer</button>
         </div>
         <div id="printerList"></div>
     </div>
 
-    <div id="distributors" class="section"><h3>Shops Content Loaded From DB</h3></div>
-    <div id="pantry" class="section"><h3>Warehouse Content Loaded From DB</h3></div>
-    <div id="suppliers" class="section"><h3>Suppliers Tracker</h3></div>
-    <div id="library" class="section"><h3>Model Library</h3></div>
-    <div id="orders" class="section"><h3>Order Tracking</h3></div>
+    <div id="distributors" class="section"><div id="locationList"></div></div>
+    <div id="pantry" class="section">
+        <div class="dash-card">
+            <label>New Stock Item</label><input type="text" id="invName">
+            <label>Stock Count</label><input type="number" id="invStock">
+            <button class="action-btn" onclick="addNewMaterial()">Add to Warehouse</button>
+        </div>
+        <div id="warehouseDisplay"></div>
+    </div>
+    
+    <div id="suppliers" class="section"><h3>Supplier Hub</h3></div>
+    <div id="library" class="section"><h3>STL Library</h3></div>
+    <div id="orders" class="section"><h3>Customer Orders</h3></div>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
         const SUPABASE_URL = 'https://yeiqourfbdormfeprvgq.supabase.co';
-        const SUPABASE_KEY = '';
+        const SUPABASE_KEY = ' '; // <--- PASTE YOUR KEY HERE
         const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-        async function loadPrinters() {
-            const { data: pData } = await supabaseClient.from('Printers').select('*');
-            const pList = document.getElementById('printerList');
-            if(!pData) return;
-            pList.innerHTML = "";
-            pData.forEach(p => {
-                const progress = (p.hours_since_service / p.service_interval) * 100;
-                const barColor = progress > 80 ? 'var(--main)' : 'var(--money)';
+        async function loadData() {
+            const { data: inv } = await supabaseClient.from('Inventory').select('*');
+            const { data: loc } = await supabaseClient.from('Locations').select('*');
+            const { data: printers } = await supabaseClient.from('Printers').select('*');
+
+            // Render Printers
+            const pList = document.getElementById('printerList'); pList.innerHTML = "";
+            (printers || []).forEach(p => {
+                const prog = (p.hours_since_service / p.service_interval) * 100;
                 pList.innerHTML += `
-                    <div class="dash-card">
-                        <div style="display:flex; justify-content:space-between;">
-                            <b>⚙️ ${p.name}</b>
-                            <span style="font-size:0.8rem; opacity:0.6;">Total: ${p.total_hours}h</span>
-                        </div>
-                        <div class="progress-bg"><div class="progress-fill" style="width:${Math.min(progress, 100)}%; background:${barColor};"></div></div>
-                        <div style="display:flex; gap:10px;">
-                            <button onclick="logWork('${p.id}')" style="flex:2; background:rgba(255,255,255,0.1); border:none; color:white; padding:10px; border-radius:10px;">+ Log Work</button>
-                            <button onclick="resetMaintenance('${p.id}')" style="flex:1; background:none; border:1px solid var(--money); color:var(--money); padding:10px; border-radius:10px; font-size:0.7rem;">Reset</button>
-                        </div>
-                    </div>`;
+                <div class="dash-card">
+                    <b>⚙️ ${p.name}</b><br><small>Life: ${p.total_hours}h</small>
+                    <div class="progress-bg"><div class="progress-fill" style="width:${Math.min(prog,100)}%; background:${prog > 80 ? 'var(--main)':'var(--money)'};"></div></div>
+                    <button class="action-btn" style="padding:10px; font-size:0.8rem;" onclick="logWork('${p.id}')">+ Log Work</button>
+                </div>`;
+            });
+
+            // Render Warehouse
+            const wD = document.getElementById('warehouseDisplay'); wD.innerHTML = "";
+            (inv || []).forEach(m => {
+                wD.innerHTML += `<div class="dash-card"><b>${m.name}</b>: ${m.stock_g} pcs</div>`;
+            });
+
+            // Render Shops
+            const lD = document.getElementById('locationList'); lD.innerHTML = "";
+            (loc || []).forEach(l => {
+                lD.innerHTML += `<div class="dash-card"><b>🏪 ${l.name}</b><br><small>Fee: ${l.commission}%</small></div>`;
             });
         }
 
         async function addPrinter() {
             const name = document.getElementById('pName').value;
-            const interval = document.getElementById('pService').value;
-            await supabaseClient.from('Printers').insert([{ name, service_interval: interval }]);
-            loadPrinters();
+            const service = document.getElementById('pService').value;
+            await supabaseClient.from('Printers').insert([{ name, service_interval: service }]);
+            loadData();
         }
 
         async function logWork(id) {
-            const hrs = prompt("Job Hours?", "5");
-            if (!hrs) return;
+            const hrs = prompt("Job duration (hrs)?", "5");
+            if(!hrs) return;
             const { data: p } = await supabaseClient.from('Printers').select('*').eq('id', id).single();
             await supabaseClient.from('Printers').update({ 
                 total_hours: p.total_hours + parseFloat(hrs),
                 hours_since_service: p.hours_since_service + parseFloat(hrs)
             }).eq('id', id);
-            loadPrinters();
-        }
-
-        async function resetMaintenance(id) {
-            if(confirm("Reset maintenance bar?")) {
-                await supabaseClient.from('Printers').update({ hours_since_service: 0 }).eq('id', id);
-                loadPrinters();
-            }
+            loadData();
         }
 
         function openSection(id, title) {
             document.getElementById('mainMenu').style.display = 'none';
             document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
             document.getElementById(id).classList.add('active');
-            document.getElementById('appTitle').innerHTML = `WS <span style="color:var(--main)">${title}</span>`;
+            document.getElementById('appTitle').innerHTML = `WS ${title}`;
             document.getElementById('backBtn').style.display = 'block';
-            if(id === 'workshop') loadPrinters();
+            loadData();
         }
 
         function showMenu() {
             document.getElementById('mainMenu').style.display = 'grid';
             document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
-            document.getElementById('appTitle').innerHTML = `WS <span style="color:var(--main)">WONDERSYNC</span>`;
+            document.getElementById('appTitle').innerHTML = `WONDERSYNC PRO`;
             document.getElementById('backBtn').style.display = 'none';
         }
     </script>
