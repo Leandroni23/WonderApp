@@ -2,24 +2,26 @@
 <html>
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>WonderSync 8.7</title>
+    <title>WonderSync Phase 1</title>
     <link rel="manifest" href="manifest.json">
     <style>
         :root { --main: #e94560; --bg: #050510; --card: rgba(22, 33, 62, 0.8); --input: #0f0f20; --money: #00ff88; }
         body { background: var(--bg); color: white; font-family: 'Segoe UI', sans-serif; margin: 0; padding-bottom: 80px; }
         .app-header { background: rgba(15, 52, 96, 0.95); padding: 25px; text-align: center; border-bottom: 2px solid var(--main); position: sticky; top: 0; z-index: 1000; backdrop-filter: blur(10px); }
         .back-btn { position: absolute; left: 20px; top: 22px; font-size: 1.8rem; cursor: pointer; display: none; color: var(--main); }
-        #mainMenu { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; padding: 20px; }
-        .menu-item { background: var(--card); padding: 30px 10px; border-radius: 25px; text-align: center; border: 1px solid rgba(255,255,255,0.05); }
-        .menu-icon { font-size: 2.5rem; display: block; margin-bottom: 10px; }
-        .menu-lbl { font-weight: 900; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; }
+        
+        /* THE SIX PILLAR GRID */
+        #mainMenu { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding: 15px; }
+        .menu-item { background: var(--card); padding: 25px 10px; border-radius: 20px; text-align: center; border: 1px solid rgba(255,255,255,0.05); }
+        .menu-icon { font-size: 2rem; display: block; margin-bottom: 8px; }
+        .menu-lbl { font-weight: 900; font-size: 0.65rem; text-transform: uppercase; letter-spacing: 1px; }
+
         .section { display: none; padding: 15px; animation: fadeIn 0.3s ease; }
         .section.active { display: block; }
         .dash-card { background: var(--card); border-radius: 20px; padding: 20px; margin-bottom: 15px; border: 1px solid rgba(255,255,255,0.1); }
         input, select { width: 100%; padding: 15px; border-radius: 12px; border: none; background: var(--input); color: white; margin-bottom: 12px; font-size: 1rem; }
         label { font-size: 0.65rem; color: var(--main); font-weight: 900; text-transform: uppercase; margin: 0 0 5px 5px; display: block; }
         .action-btn { background: var(--main); color: white; border: none; padding: 18px; border-radius: 15px; width: 100%; font-weight: 900; cursor: pointer; }
-        .shop-inv-item { display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.4); padding: 12px; border-radius: 12px; margin-bottom: 8px; border-left: 4px solid var(--money); }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
@@ -27,135 +29,54 @@
 
     <div class="app-header">
         <span id="backBtn" class="back-btn" onclick="showMenu()">‹</span>
-        <div id="appTitle" style="font-weight: 900; letter-spacing: 3px; font-size: 1.1rem;">WS <span style="color:var(--main)">8.7 ACTIVE</span></div>
+        <div id="appTitle" style="font-weight: 900; letter-spacing: 3px; font-size: 1.1rem;">WS <span style="color:var(--main)">PHASE 1</span></div>
     </div>
 
     <div id="mainMenu">
         <div class="menu-item" onclick="openSection('distributors', 'SHOPS')"><span class="menu-icon">🏪</span><span class="menu-lbl">Shops</span></div>
         <div class="menu-item" onclick="openSection('pantry', 'WAREHOUSE')"><span class="menu-icon">📦</span><span class="menu-lbl">Warehouse</span></div>
-        <div class="menu-item" onclick="openSection('service', 'LIVE JOB')"><span class="menu-icon">🚀</span><span class="menu-lbl">Live Job</span></div>
-        <div class="menu-item" onclick="openSection('workshop', 'WORKSHOP')"><span class="menu-icon">⚙️</span><span class="menu-lbl">Workshop</span></div>
+        <div class="menu-item" onclick="openSection('suppliers', 'SUPPLIERS')"><span class="menu-icon">🚚</span><span class="menu-lbl">Suppliers</span></div>
+        <div class="menu-item" onclick="openSection('library', 'LIBRARY')"><span class="menu-icon">📚</span><span class="menu-lbl">Library</span></div>
+        <div class="menu-item" onclick="openSection('workshop', 'PRINTERS')"><span class="menu-icon">⚙️</span><span class="menu-lbl">Printers</span></div>
+        <div class="menu-item" onclick="openSection('orders', 'ORDERS')"><span class="menu-icon">🛒</span><span class="menu-lbl">Orders</span></div>
     </div>
 
-    <div id="pantry" class="section">
+    <div id="distributors" class="section"><div id="locationList"></div></div>
+    <div id="pantry" class="section"><div id="warehouseDisplay"></div></div>
+    
+    <div id="suppliers" class="section">
         <div class="dash-card">
-            <label>Item Name</label><input type="text" id="invName">
-            <label>Category</label>
-            <select id="invCat">
-                <option value="FINISHED">Finished Product</option>
-                <option value="PLA">Raw Filament</option>
-            </select>
-            <label>Stock</label><input type="number" id="invStock">
-            <button class="action-btn" onclick="addNewMaterial()">Add to Pantry</button>
+            <label>Supplier Name</label><input type="text" placeholder="e.g. Amazon, Creality">
+            <label>Website/Link</label><input type="text" placeholder="https://...">
+            <button class="action-btn">Register Supplier</button>
         </div>
-        <div id="warehouseDisplay"></div>
     </div>
 
-    <div id="distributors" class="section">
-        <div id="locationList"></div>
+    <div id="library" class="section">
+        <div class="dash-card"><p style="text-align:center; opacity:0.5;">STL Model Files Storage Coming Soon</p></div>
     </div>
 
-    <div id="service" class="section">
-        <div class="dash-card" style="text-align:center;">
-            <label>Total Profit</label>
-            <div id="dashProfit" style="font-size:3rem; font-weight:900; color:var(--money);">€0.00</div>
+    <div id="workshop" class="section">
+        <div class="dash-card">
+            <label>Printer Name</label><input type="text" placeholder="e.g. Ender 3 V3">
+            <label>Status</label>
+            <select><option>Idle</option><option>Printing</option><option>Maintenance</option></select>
+            <button class="action-btn">Add Printer</button>
         </div>
+    </div>
+
+    <div id="orders" class="section">
+        <div class="dash-card"><p style="text-align:center; opacity:0.5;">Active Customer Orders Tracker</p></div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
         const SUPABASE_URL = 'https://yeiqourfbdormfeprvgq.supabase.co';
-        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InllaXFvdXJmYmRvcm1mZXBydmdxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU2ODM1NTcsImV4cCI6MjA5MTI1OTU1N30.UWLPlGfNquzDYWow85CEztwpEMM9sgHlEeQLLPjRrdc';
+        const SUPABASE_KEY = ' '; // <--- PASTE YOUR KEY HERE
         const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-        let materials = [], locations = [];
-
-        async function loadAll() {
-            const { data: inv } = await supabaseClient.from('Inventory').select('*');
-            const { data: loc } = await supabaseClient.from('Locations').select('*');
-            const { data: hist } = await supabaseClient.from('History').select('*');
-            if(!inv || !loc) return; 
-            materials = inv; locations = loc;
-
-            let profit = 0; hist.forEach(h => profit += h.profit);
-            document.getElementById('dashProfit').innerText = "€" + profit.toFixed(2);
-
-            const wD = document.getElementById('warehouseDisplay'); wD.innerHTML = "";
-            inv.forEach(m => {
-                wD.innerHTML += `<div class="dash-card" style="display:flex; justify-content:space-between;">
-                    <b>${m.name}</b> <span>${m.stock_g} pcs</span>
-                </div>`;
-            });
-
-            const lD = document.getElementById('locationList'); lD.innerHTML = "";
-            loc.forEach(l => {
-                let stockItems = "";
-                if(l.inventory) {
-                    for(let [name, qty] of Object.entries(l.inventory)) {
-                        if(qty > 0) stockItems += `
-                            <div class="shop-inv-item">
-                                <span>${name} (x${qty})</span>
-                                <button onclick="sellItem('${l.id}', '${name}')" style="background:var(--money); border:none; padding:5px 10px; border-radius:8px; font-weight:bold;">SELL</button>
-                            </div>`;
-                    }
-                }
-                lD.innerHTML += `<div class="dash-card">
-                    <b>🏪 ${l.name}</b><br><br>
-                    ${stockItems || "No stock."}
-                    <hr style="opacity:0.1; margin:15px 0;">
-                    <select id="sel-${l.id}">
-                        ${materials.filter(m=>m.category==='FINISHED').map(m=>`<option value="${m.id}">${m.name} (${m.stock_g} home)</option>`).join("")}
-                    </select>
-                    <input type="number" id="qty-${l.id}" placeholder="Qty" style="width:60px;">
-                    <button onclick="dispatch('${l.id}')" style="background:var(--main); color:white; border:none; border-radius:10px; padding:10px;">ADD</button>
-                </div>`;
-            });
-        }
-
-        async function dispatch(locId) {
-            const itemId = document.getElementById(`sel-${locId}`).value;
-            const qty = parseInt(document.getElementById(`qty-${locId}`).value);
-            const item = materials.find(m => m.id == itemId);
-            const loc = locations.find(l => l.id == locId);
-            await supabaseClient.from('Inventory').update({ stock_g: item.stock_g - qty }).eq('id', itemId);
-            let inv = loc.inventory || {}; inv[item.name] = (inv[item.name] || 0) + qty;
-            await supabaseClient.from('Locations').update({ inventory: inv }).eq('id', locId);
-            loadAll();
-        }
-
-        async function sellItem(locId, itemName) {
-            const loc = locations.find(l => l.id == locId);
-            const price = prompt(`Sale Price?`, "5.00");
-            if(!price) return;
-            let inv = loc.inventory; inv[itemName] -= 1;
-            const profit = parseFloat(price) * (1 - (loc.commission/100));
-            await supabaseClient.from('Locations').update({ inventory: inv }).eq('id', locId);
-            await supabaseClient.from('History').insert([{ print_name: `Sale: ${itemName}`, profit: profit }]);
-            loadAll();
-        }
-
-        async function addNewMaterial() {
-            const name = document.getElementById('invName').value;
-            const cat = document.getElementById('invCat').value;
-            const stock = document.getElementById('invStock').value;
-            await supabaseClient.from('Inventory').insert([{ name, category: cat, stock_g: stock, price_paid: 0 }]);
-            loadAll();
-        }
-
-        function openSection(id, title) {
-            document.getElementById('mainMenu').style.display = 'none';
-            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
-            document.getElementById(id).classList.add('active');
-            document.getElementById('appTitle').innerHTML = `WS ${title}`;
-            document.getElementById('backBtn').style.display = 'block';
-        }
-        function showMenu() {
-            document.getElementById('mainMenu').style.display = 'grid';
-            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
-            document.getElementById('appTitle').innerHTML = `WS 8.7 ACTIVE`;
-            document.getElementById('backBtn').style.display = 'none';
-        }
-        loadAll();
+        // ... [Rest of your loading logic from 8.7 stays the same] ...
+        // (Just ensure loadAll() is called at the end)
     </script>
 </body>
 </html>
