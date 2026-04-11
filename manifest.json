@@ -1,0 +1,17 @@
+{
+  "name": "WonderSync Global",
+  "short_name": "WonderSync",
+  "start_url": "/index.html",
+  "display": "standalone",
+  "background_color": "#050510",
+  "theme_color": "#e94560",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "https://cdn-icons-png.flaticon.com/512/9356/9356230.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
