@@ -9,7 +9,7 @@
         .app-header { background: rgba(15, 52, 96, 0.95); padding: 20px; text-align: center; border-bottom: 2px solid var(--main); position: sticky; top: 0; z-index: 1000; }
         .back-btn { position: absolute; left: 20px; top: 18px; font-size: 1.8rem; cursor: pointer; display: none; color: var(--main); }
         #mainMenu { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding: 15px; }
-        .menu-item { background: var(--card); padding: 25px 10px; border-radius: 20px; text-align: center; border: 1px solid rgba(255,255,255,0.05); cursor: pointer; }
+        .menu-item { background: var(--card); padding: 25px 10px; border-radius: 20px; text-align: center; border: 1px solid rgba(255,255,255,0.05); cursor: pointer; font-weight: bold; }
         .section { display: none; padding: 15px; animation: fadeIn 0.3s ease; }
         .section.active { display: block; }
         .dash-card { background: var(--card); border-radius: 20px; padding: 18px; margin-bottom: 12px; border: 1px solid rgba(255,255,255,0.1); }
@@ -18,6 +18,8 @@
         .action-btn { background: var(--main); color: white; border: none; padding: 15px; border-radius: 15px; width: 100%; font-weight: 900; cursor: pointer; }
         .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
         .stat-val { font-size: 1.4rem; font-weight: 900; color: var(--money); }
+        .shop-inv-item { display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.3); padding: 10px; border-radius: 10px; margin-bottom: 8px; border-left: 3px solid var(--money); }
+        .progress-bg { background: var(--input); height: 10px; border-radius: 5px; overflow: hidden; margin: 8px 0; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
@@ -29,15 +31,15 @@
     </div>
 
     <div id="mainMenu">
-        <div class="menu-item" onclick="openSection('pantry', 'PRODUCT CREATOR')">🎨 CREATOR</div>
-        <div class="menu-item" onclick="openSection('suppliers', 'INVENTORY')">🧵 FILAMENT</div>
-        <div class="menu-item" onclick="openSection('parts', 'PRINTER PARTS')">🔧 PARTS</div>
-        <div class="menu-item" onclick="openSection('distributors', 'FRANCHISE')">🏪 FRANCHISE</div>
-        <div class="menu-item" onclick="openSection('workshop', 'MAINTENANCE')">⚙️ PRINTERS</div>
-        <div class="menu-item" onclick="openSection('pl', 'P&L DATA')">💰 P & L</div>
+        <div class="menu-item" onclick="openSection('creator', 'PRODUCT CREATOR')"><span style="font-size:1.5rem;display:block;">🎨</span>CREATOR</div>
+        <div class="menu-item" onclick="openSection('suppliers', 'FILAMENTS')"><span style="font-size:1.5rem;display:block;">🧵</span>FILAMENT</div>
+        <div class="menu-item" onclick="openSection('parts', 'PRINTER PARTS')"><span style="font-size:1.5rem;display:block;">🔧</span>PARTS</div>
+        <div class="menu-item" onclick="openSection('distributors', 'FRANCHISE BI')"><span style="font-size:1.5rem;display:block;">🏪</span>FRANCHISE</div>
+        <div class="menu-item" onclick="openSection('workshop', 'MAINTENANCE')"><span style="font-size:1.5rem;display:block;">⚙️</span>PRINTERS</div>
+        <div class="menu-item" onclick="openSection('pl', 'P&L DATA')"><span style="font-size:1.5rem;display:block;">💰</span>P & L</div>
     </div>
 
-    <div id="pantry" class="section">
+    <div id="creator" class="section">
         <div class="dash-card">
             <h3 style="margin:0 0 15px 0; color:var(--money)">Costing & Profit Calculator</h3>
             <label>Print Name</label><input type="text" id="calcName" placeholder="Iron Man Mask">
@@ -66,6 +68,28 @@
         <div id="warehouseDisplay"></div>
     </div>
 
+    <div id="distributors" class="section">
+        <div id="locationList"></div>
+    </div>
+
+    <div id="suppliers" class="section">
+        <div class="dash-card">
+            <label>Roll Name</label><input type="text" id="filName">
+            <label>Price per 1kg Roll</label><input type="number" id="filCost">
+            <button class="action-btn" onclick="addFilament()">Add Filament</button>
+        </div>
+        <div id="filamentList"></div>
+    </div>
+
+    <div id="workshop" class="section">
+        <div class="dash-card">
+            <label>Printer Name</label><input type="text" id="pName">
+            <label>Service Every (Hrs)</label><input type="number" id="pService" value="200">
+            <button class="action-btn" onclick="addPrinter()">Add Printer</button>
+        </div>
+        <div id="printerList"></div>
+    </div>
+
     <div id="parts" class="section">
         <div class="dash-card">
             <label>Part Name</label><input type="text" id="partName" placeholder="Nozzle 0.4mm">
@@ -75,17 +99,15 @@
         <div id="partsList"></div>
     </div>
 
-    <div id="suppliers" class="section"><div id="filamentList"></div></div>
-    <div id="distributors" class="section"><div id="locationList"></div></div>
-    <div id="workshop" class="section"><div id="printerList"></div></div>
     <div id="pl" class="section">
         <div class="dash-card" style="text-align:center;">
             <label>Company Investment</label>
             <div class="stat-val" id="totalInvest">€0.00</div>
             <hr style="opacity:0.1; margin:15px 0;">
-            <label>Net Profit/Loss</label>
+            <label>Net Operating Profit</label>
             <div class="stat-val" id="totalNetPL">€0.00</div>
         </div>
+        <div id="invoiceList"></div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -94,24 +116,49 @@
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InllaXFvdXJmYmRvcm1mZXBydmdxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU2ODM1NTcsImV4cCI6MjA5MTI1OTU1N30.UWLPlGfNquzDYWow85CEztwpEMM9sgHlEeQLLPjRrdc';
         const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-        let materials = [], locations = [], filaments = [], parts = [];
+        let materials = [], locations = [], filaments = [], printers = [], invoices = [];
 
         async function loadData() {
             const { data: inv } = await supabaseClient.from('Inventory').select('*');
             const { data: loc } = await supabaseClient.from('Locations').select('*');
             const { data: fil } = await supabaseClient.from('Filaments').select('*');
             const { data: pnt } = await supabaseClient.from('Printers').select('*');
+            const { data: ivs } = await supabaseClient.from('Invoices').select('*').order('created_at', {ascending: false});
             
-            materials = inv || []; locations = loc || []; filaments = fil || [];
+            materials = inv || []; locations = loc || []; filaments = fil || []; printers = pnt || []; invoices = ivs || [];
 
+            // 1. Filaments
             const filSel = document.getElementById('calcFilId');
             if(filSel) filSel.innerHTML = filaments.map(f => `<option value="${f.id}">${f.name}</option>`).join("");
-            
-            const wD = document.getElementById('warehouseDisplay');
-            if(wD) wD.innerHTML = materials.map(m => `<div class="dash-card"><b>${m.name}</b>: ${m.stock_g} units</div>`).join("");
+            const fList = document.getElementById('filamentList');
+            if(fList) fList.innerHTML = filaments.map(f => `<div class="dash-card"><b>🧵 ${f.name}</b>: €${f.cost_per_kg}/kg</div>`).join("");
 
+            // 2. Creator Warehouse View
+            const wD = document.getElementById('warehouseDisplay');
+            if(wD) wD.innerHTML = materials.map(m => `<div class="dash-card"><b>📦 ${m.name}</b>: ${m.stock_g} units</div>`).join("");
+
+            // 3. Franchise Shops
             const lD = document.getElementById('locationList');
-            if(lD) lD.innerHTML = locations.map(l => `<div class="dash-card"><b>🏪 ${l.name}</b></div>`).join("");
+            if(lD) lD.innerHTML = locations.map(l => {
+                let stockItems = "";
+                if(l.inventory) {
+                    for(let [name, qty] of Object.entries(l.inventory)) {
+                        if(qty > 0) stockItems += `<div class="shop-inv-item"><span>${name} (x${qty})</span><button onclick="sellItem('${l.id}','${name}')" style="background:var(--money); border:none; padding:5px; border-radius:5px; font-weight:bold;">SELL</button></div>`;
+                    }
+                }
+                return `<div class="dash-card"><b>🏪 ${l.name}</b><br><small>Commission: ${l.commission}%</small><hr style="opacity:0.1">${stockItems || "No stock"}</div>`;
+            }).join("");
+
+            // 4. Printers
+            const pL = document.getElementById('printerList');
+            if(pL) pL.innerHTML = printers.map(p => {
+                const prog = (p.hours_since_service / p.service_interval) * 100;
+                return `<div class="dash-card"><b>⚙️ ${p.name}</b> <small>(${p.total_hours.toFixed(1)}h)</small><div class="progress-bg"><div style="width:${Math.min(prog,100)}%; background:${prog > 80 ? 'var(--main)':'var(--money)'}; height:100%;"></div></div><button class="action-btn" style="padding:10px" onclick="logWork('${p.id}')">Log Hours</button></div>`;
+            }).join("");
+
+            // 5. P&L / Invoices
+            const iL = document.getElementById('invoiceList');
+            if(iL) iL.innerHTML = "<h3>Sales History</h3>" + invoices.map(i => `<div class="dash-card" style="border-left:4px solid var(--money)"><b>${i.client_name}</b>: €${i.total_amount.toFixed(2)}</div>`).join("");
         }
 
         function runCosting() {
@@ -121,7 +168,7 @@
             const target = parseFloat(document.getElementById('targetPrice').value) || 0;
 
             const filamentCost = f ? (g * (f.cost_per_kg/1000)) : 0;
-            const machineCost = hrs * 1.0; // Your 1€/hr rule
+            const machineCost = hrs * 1.0; // Your 1€/hr rule from notebook
             const realCost = filamentCost + machineCost;
             const profit = target - realCost;
             const margin = target > 0 ? (profit / target) * 100 : 0;
@@ -133,9 +180,39 @@
 
         async function saveProductToWarehouse() {
             const name = document.getElementById('calcName').value;
-            if(!name) return alert("Enter product name");
+            if(!name) return alert("Product name required");
             await supabaseClient.from('Inventory').insert([{ name, stock_g: 1, category: 'FINISHED' }]);
-            alert("Added to Warehouse!");
+            loadData();
+        }
+
+        async function sellItem(locId, itemName) {
+            const price = prompt("Final Sale Price?");
+            if(!price) return;
+            const loc = locations.find(l => l.id == locId);
+            let inv = loc.inventory; inv[itemName] -= 1;
+            await supabaseClient.from('Locations').update({ inventory: inv }).eq('id', locId);
+            await supabaseClient.from('Invoices').insert([{ client_name: `Sale: ${itemName}`, total_amount: parseFloat(price), status: 'Paid' }]);
+            loadData();
+        }
+
+        async function addFilament() {
+            const n = document.getElementById('filName').value;
+            const c = document.getElementById('filCost').value;
+            await supabaseClient.from('Filaments').insert([{ name: n, cost_per_kg: c }]);
+            loadData();
+        }
+
+        async function addPrinter() {
+            const n = document.getElementById('pName').value;
+            const s = document.getElementById('pService').value;
+            await supabaseClient.from('Printers').insert([{ name: n, service_interval: s }]);
+            loadData();
+        }
+
+        async function logWork(id) {
+            const h = prompt("Hours added?");
+            const { data: p } = await supabaseClient.from('Printers').select('*').eq('id', id).single();
+            await supabaseClient.from('Printers').update({ total_hours: p.total_hours + parseFloat(h), hours_since_service: p.hours_since_service + parseFloat(h) }).eq('id', id);
             loadData();
         }
 
