@@ -2,22 +2,22 @@
 <html>
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>WonderSync V9 - Profit & Recipes</title>
+    <title>WonderSync V9.1 - Multi-Filament</title>
     <style>
         :root { --main: #e94560; --bg: #050510; --card: rgba(22, 33, 62, 0.8); --input: #0f0f20; --money: #00ff88; }
         body { background: var(--bg); color: white; font-family: 'Segoe UI', sans-serif; margin: 0; padding-bottom: 80px; }
         .app-header { background: rgba(15, 52, 96, 0.95); padding: 25px; text-align: center; border-bottom: 2px solid var(--main); position: sticky; top: 0; z-index: 1000; }
         .back-btn { position: absolute; left: 20px; top: 22px; font-size: 1.8rem; cursor: pointer; display: none; color: var(--main); }
         #mainMenu { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding: 15px; }
-        .menu-item { background: var(--card); padding: 25px 10px; border-radius: 20px; text-align: center; border: 1px solid rgba(255,255,255,0.05); cursor: pointer; }
+        .menu-item { background: var(--card); padding: 25px 10px; border-radius: 20px; text-align: center; border: 1px solid rgba(255,255,255,0.05); }
         .section { display: none; padding: 15px; animation: fadeIn 0.3s ease; }
         .section.active { display: block; }
-        .dash-card { background: var(--card); border-radius: 20px; padding: 20px; margin-bottom: 15px; border: 1px solid rgba(255,255,255,0.1); }
-        input, select { width: 100%; padding: 15px; border-radius: 12px; border: none; background: var(--input); color: white; margin-bottom: 12px; font-size: 1rem; box-sizing: border-box; }
-        label { font-size: 0.65rem; color: var(--main); font-weight: 900; text-transform: uppercase; margin-bottom: 5px; display: block; }
+        .dash-card { background: var(--card); border-radius: 20px; padding: 18px; margin-bottom: 12px; border: 1px solid rgba(255,255,255,0.1); }
+        input, select { width: 100%; padding: 14px; border-radius: 12px; border: none; background: var(--input); color: white; margin-bottom: 10px; font-size: 1rem; box-sizing: border-box; }
+        label { font-size: 0.65rem; color: var(--main); font-weight: 900; text-transform: uppercase; margin-bottom: 4px; display: block; }
         .action-btn { background: var(--main); color: white; border: none; padding: 15px; border-radius: 15px; width: 100%; font-weight: 900; cursor: pointer; }
         .shop-inv-item { display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.3); padding: 10px; border-radius: 10px; margin-bottom: 8px; border-left: 3px solid var(--money); }
-        .profit-tag { color: var(--money); font-weight: bold; font-size: 0.9rem; }
+        .progress-bg { background: var(--input); height: 10px; border-radius: 5px; overflow: hidden; margin: 8px 0; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
@@ -25,36 +25,49 @@
 
     <div class="app-header">
         <span id="backBtn" class="back-btn" onclick="showMenu()">‹</span>
-        <div id="appTitle" style="font-weight: 900; letter-spacing: 3px;">WONDERSYNC <span style="color:var(--main)">TOTAL</span></div>
+        <div id="appTitle" style="font-weight: 900; letter-spacing: 2px;">WONDERSYNC <span style="color:var(--main)">V9.1</span></div>
     </div>
 
     <div id="mainMenu">
-        <div class="menu-item" onclick="openSection('distributors', 'SHOPS')"><span style="font-size:2rem;display:block;">🏪</span>SHOPS</div>
-        <div class="menu-item" onclick="openSection('pantry', 'WAREHOUSE')"><span style="font-size:2rem;display:block;">📦</span>WAREHOUSE</div>
-        <div class="menu-item" onclick="openSection('suppliers', 'SUPPLIERS')"><span style="font-size:2rem;display:block;">🚚</span>SUPPLIERS</div>
-        <div class="menu-item" onclick="openSection('workshop', 'PRINTERS')"><span style="font-size:2rem;display:block;">⚙️</span>PRINTERS</div>
-        <div class="menu-item" onclick="openSection('library', 'LIBRARY')"><span style="font-size:2rem;display:block;">📚</span>LIBRARY</div>
-        <div class="menu-item" onclick="openSection('orders', 'ORDERS')"><span style="font-size:2rem;display:block;">🛒</span>ORDERS</div>
+        <div class="menu-item" onclick="openSection('distributors', 'SHOPS')"><span style="font-size:1.8rem;display:block;">🏪</span>SHOPS</div>
+        <div class="menu-item" onclick="openSection('pantry', 'WAREHOUSE')"><span style="font-size:1.8rem;display:block;">📦</span>WAREHOUSE</div>
+        <div class="menu-item" onclick="openSection('suppliers', 'FILAMENTS')"><span style="font-size:1.8rem;display:block;">🧵</span>FILAMENTS</div>
+        <div class="menu-item" onclick="openSection('workshop', 'PRINTERS')"><span style="font-size:1.8rem;display:block;">⚙️</span>PRINTERS</div>
+        <div class="menu-item" onclick="openSection('library', 'LIBRARY')"><span style="font-size:1.8rem;display:block;">📚</span>LIBRARY</div>
+        <div class="menu-item" onclick="openSection('orders', 'ORDERS')"><span style="font-size:1.8rem;display:block;">🛒</span>ORDERS</div>
+    </div>
+
+    <div id="suppliers" class="section">
+        <div class="dash-card">
+            <label>Filament Name/Color</label><input type="text" id="filName" placeholder="e.g. Matte Black PLA">
+            <label>Cost per 1kg Roll (€)</label><input type="number" id="filCost" placeholder="20.00">
+            <button class="action-btn" onclick="addFilament()">Register Roll</button>
+        </div>
+        <div id="filamentList"></div>
     </div>
 
     <div id="library" class="section">
         <div class="dash-card">
-            <label>Print Name</label><input type="text" id="recName" placeholder="e.g. WL Keychain">
-            <label>Grams of Filament</label><input type="number" id="recGrams" placeholder="15">
-            <label>Filament Cost per kg (€)</label><input type="number" id="recCost" value="20">
+            <label>Model Name</label><input type="text" id="recName">
+            <label>Grams Used</label><input type="number" id="recGrams">
+            <label>Assign Filament</label>
+            <select id="recFilamentId"></select>
             <button class="action-btn" onclick="addRecipe()">Save Recipe</button>
         </div>
         <div id="recipeList"></div>
     </div>
 
-    <div id="distributors" class="section">
-        <div id="locationList"></div>
+    <div id="distributors" class="section"><div id="locationList"></div></div>
+    <div id="pantry" class="section">
+        <div class="dash-card">
+            <label>New Product</label><input type="text" id="invName">
+            <label>Qty</label><input type="number" id="invStock">
+            <button class="action-btn" onclick="addNewMaterial()">To Warehouse</button>
+        </div>
+        <div id="warehouseDisplay"></div>
     </div>
-
-    <div id="pantry" class="section"><div id="warehouseDisplay"></div></div>
     <div id="workshop" class="section"><div id="printerList"></div></div>
     <div id="orders" class="section"><div id="invoiceList"></div></div>
-    <div id="suppliers" class="section"><h3>Supplier Hub</h3></div>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
@@ -62,78 +75,99 @@
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InllaXFvdXJmYmRvcm1mZXBydmdxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU2ODM1NTcsImV4cCI6MjA5MTI1OTU1N30.UWLPlGfNquzDYWow85CEztwpEMM9sgHlEeQLLPjRrdc';
         const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-        let materials = [], locations = [], recipes = [];
+        let materials = [], locations = [], recipes = [], filaments = [];
 
         async function loadData() {
             const { data: inv } = await supabaseClient.from('Inventory').select('*');
             const { data: loc } = await supabaseClient.from('Locations').select('*');
             const { data: rec } = await supabaseClient.from('Recipes').select('*');
             const { data: pnt } = await supabaseClient.from('Printers').select('*');
+            const { data: fil } = await supabaseClient.from('Filaments').select('*');
+            const { data: ivs } = await supabaseClient.from('Invoices').select('*').order('created_at', {ascending: false});
+
+            materials = inv || []; locations = loc || []; recipes = rec || []; filaments = fil || [];
+
+            // 1. Filament Dropdown & List
+            const filSelect = document.getElementById('recFilamentId');
+            if(filSelect) filSelect.innerHTML = filaments.map(f => `<option value="${f.id}">${f.name}</option>`).join("");
             
-            materials = inv || []; locations = loc || []; recipes = rec || [];
+            const filList = document.getElementById('filamentList');
+            if(filList) filList.innerHTML = filaments.map(f => `<div class="dash-card"><b>🧵 ${f.name}</b><br><small>Cost: €${f.cost_per_kg}/kg</small></div>`).join("");
 
-            // Render Recipes
+            // 2. Recipes Render
             const rList = document.getElementById('recipeList');
-            if(rList) rList.innerHTML = recipes.map(r => `
-                <div class="dash-card"><b>${r.name}</b><br><small>${r.grams_used}g | Cost: €${((r.grams_used * r.filament_cost_per_g) || 0).toFixed(2)}</small></div>
-            `).join("");
+            if(rList) rList.innerHTML = recipes.map(r => {
+                const f = filaments.find(fil => fil.id === r.filament_id);
+                const cost = f ? (r.grams_used * (f.cost_per_kg/1000)) : 0;
+                return `<div class="dash-card"><b>${r.name}</b><br><small>${r.grams_used}g ${f?f.name:''} | Cost: €${cost.toFixed(2)}</small></div>`;
+            }).join("");
 
-            // Render Shops with SELL button
+            // 3. Shops & Sell Logic
             const lD = document.getElementById('locationList');
             if(lD) {
                 lD.innerHTML = locations.map(l => {
-                    let stockHtml = "";
+                    let stockItems = "";
                     if(l.inventory) {
                         for(let [name, qty] of Object.entries(l.inventory)) {
-                            if(qty > 0) stockHtml += `
+                            if(qty > 0) stockItems += `
                                 <div class="shop-inv-item">
                                     <span>${name} (x${qty})</span>
                                     <button onclick="sellFromShop('${l.id}', '${name}')" style="background:var(--money); border:none; padding:5px 10px; border-radius:8px; font-weight:bold;">SELL</button>
                                 </div>`;
                         }
                     }
-                    return `<div class="dash-card">
-                        <b>🏪 ${l.name}</b><br><small>Commission: ${l.commission}%</small><hr style="opacity:0.1">
-                        ${stockHtml || "Empty"}
-                    </div>`;
+                    return `<div class="dash-card"><b>🏪 ${l.name}</b><br><small>Commission: ${l.commission}%</small><hr style="opacity:0.1">${stockItems || "No stock."}</div>`;
                 }).join("");
             }
+
+            // 4. Printers Render (With Rounding)
+            const pList = document.getElementById('printerList');
+            if(pList) pList.innerHTML = (pnt || []).map(p => `
+                <div class="dash-card">
+                    <b>⚙️ ${p.name}</b> <small>(${p.total_hours.toFixed(1)}h)</small>
+                    <div class="progress-bg"><div style="width:${Math.min((p.hours_since_service/p.service_interval)*100, 100)}%; background:${(p.hours_since_service/p.service_interval)>0.8?'var(--main)':'var(--money)'}; height:100%;"></div></div>
+                    <button class="action-btn" style="padding:10px" onclick="logWork('${p.id}')">Log Work</button>
+                </div>`).join("");
+        }
+
+        async function addFilament() {
+            const name = document.getElementById('filName').value;
+            const cost = document.getElementById('filCost').value;
+            await supabaseClient.from('Filaments').insert([{ name, cost_per_kg: cost }]);
+            loadData();
         }
 
         async function addRecipe() {
             const name = document.getElementById('recName').value;
             const grams = document.getElementById('recGrams').value;
-            const costPerKg = document.getElementById('recCost').value;
-            const costPerG = costPerKg / 1000;
-            await supabaseClient.from('Recipes').insert([{ name, grams_used: grams, filament_cost_per_g: costPerG }]);
+            const filId = document.getElementById('recFilamentId').value;
+            // Note: Ensure your Recipes table has a filament_id column!
+            await supabaseClient.from('Recipes').insert([{ name, grams_used: grams, filament_id: filId }]);
             loadData();
         }
 
         async function sellFromShop(locId, itemName) {
-            const price = prompt(`Sale price for ${itemName}?`, "5.00");
+            const price = prompt(`Sale price?`, "5.00");
             if(!price) return;
-
             const loc = locations.find(l => l.id == locId);
             const recipe = recipes.find(r => r.name === itemName);
+            const filament = recipe ? filaments.find(f => f.id === recipe.filament_id) : null;
             
-            // Calculate Costs
-            const materialCost = recipe ? (recipe.grams_used * recipe.filament_cost_per_g) : 0;
-            const commissionCost = parseFloat(price) * (loc.commission / 100);
-            const finalProfit = parseFloat(price) - materialCost - commissionCost;
+            const materialCost = (recipe && filament) ? (recipe.grams_used * (filament.cost_per_kg/1000)) : 0;
+            const finalProfit = parseFloat(price) * (1 - (loc.commission/100)) - materialCost;
 
-            // Update Stock
-            let newInv = loc.inventory;
-            newInv[itemName] -= 1;
-            
+            let newInv = loc.inventory; newInv[itemName] -= 1;
             await supabaseClient.from('Locations').update({ inventory: newInv }).eq('id', locId);
-            
-            // Record to History
-            await supabaseClient.from('History').insert([{ 
-                print_name: `Sale: ${itemName} at ${loc.name}`, 
-                profit: finalProfit 
-            }]);
+            await supabaseClient.from('History').insert([{ print_name: `Sale: ${itemName}`, profit: finalProfit }]);
+            alert(`Net Profit: €${finalProfit.toFixed(2)}`);
+            loadData();
+        }
 
-            alert(`Profit recorded: €${finalProfit.toFixed(2)}`);
+        // --- COMMON FUNCTIONS ---
+        async function logWork(id) {
+            const hrs = prompt("Hours?"); if(!hrs) return;
+            const { data: p } = await supabaseClient.from('Printers').select('*').eq('id', id).single();
+            await supabaseClient.from('Printers').update({ total_hours: p.total_hours + parseFloat(hrs), hours_since_service: p.hours_since_service + parseFloat(hrs) }).eq('id', id);
             loadData();
         }
 
@@ -149,7 +183,7 @@
         function showMenu() {
             document.getElementById('mainMenu').style.display = 'grid';
             document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
-            document.getElementById('appTitle').innerHTML = `WONDERSYNC TOTAL`;
+            document.getElementById('appTitle').innerHTML = `WONDERSYNC V9.1`;
             document.getElementById('backBtn').style.display = 'none';
         }
 
