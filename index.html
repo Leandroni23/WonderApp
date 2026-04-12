@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>WonderSync V9.1 - Multi-Filament</title>
+    <title>WonderSync V10 - Master System</title>
     <style>
         :root { --main: #e94560; --bg: #050510; --card: rgba(22, 33, 62, 0.8); --input: #0f0f20; --money: #00ff88; }
         body { background: var(--bg); color: white; font-family: 'Segoe UI', sans-serif; margin: 0; padding-bottom: 80px; }
@@ -25,7 +25,7 @@
 
     <div class="app-header">
         <span id="backBtn" class="back-btn" onclick="showMenu()">‹</span>
-        <div id="appTitle" style="font-weight: 900; letter-spacing: 2px;">WONDERSYNC <span style="color:var(--main)">V9.1</span></div>
+        <div id="appTitle" style="font-weight: 900; letter-spacing: 2px;">WONDERSYNC <span style="color:var(--main)">V10</span></div>
     </div>
 
     <div id="mainMenu">
@@ -37,37 +37,53 @@
         <div class="menu-item" onclick="openSection('orders', 'ORDERS')"><span style="font-size:1.8rem;display:block;">🛒</span>ORDERS</div>
     </div>
 
+    <div id="pantry" class="section">
+        <div class="dash-card" style="border: 1px solid var(--money);">
+            <h3 style="margin-top:0; color:var(--money);">Job Calculator 💰</h3>
+            <label>Print Name</label><input type="text" id="calcName" placeholder="Iron Man Mask">
+            <label>Select Filament</label><select id="calcFilId" onchange="runCalc()"></select>
+            <label>Print Weight (g)</label><input type="number" id="calcG" oninput="runCalc()">
+            <div style="font-size:0.8rem; margin-bottom:10px;">
+                <input type="checkbox" id="calcBuf" onchange="runCalc()"> +15% Waste Buffer
+            </div>
+            <div style="background:var(--input); padding:15px; border-radius:12px; text-align:center;">
+                <div id="suggestedPrice" style="font-size:1.8rem; font-weight:900; color:var(--money);">€0.00</div>
+                <small>Material Cost: <span id="matCost">€0.00</span></small>
+            </div>
+            <button class="action-btn" style="margin-top:10px; background:var(--money); color:var(--bg);" onclick="finishPrint()">Finish & Add to Warehouse</button>
+        </div>
+        <div id="warehouseDisplay"></div>
+    </div>
+
+    <div id="distributors" class="section"><div id="locationList"></div></div>
+
     <div id="suppliers" class="section">
         <div class="dash-card">
-            <label>Filament Name/Color</label><input type="text" id="filName" placeholder="e.g. Matte Black PLA">
-            <label>Cost per 1kg Roll (€)</label><input type="number" id="filCost" placeholder="20.00">
-            <button class="action-btn" onclick="addFilament()">Register Roll</button>
+            <label>Roll Name</label><input type="text" id="filName">
+            <label>Price per 1kg Roll</label><input type="number" id="filCost">
+            <button class="action-btn" onclick="addFilament()">Add Filament</button>
         </div>
         <div id="filamentList"></div>
     </div>
 
-    <div id="library" class="section">
+    <div id="workshop" class="section">
         <div class="dash-card">
-            <label>Model Name</label><input type="text" id="recName">
-            <label>Grams Used</label><input type="number" id="recGrams">
-            <label>Assign Filament</label>
-            <select id="recFilamentId"></select>
-            <button class="action-btn" onclick="addRecipe()">Save Recipe</button>
+            <label>Printer Name</label><input type="text" id="pName">
+            <label>Service Every (Hrs)</label><input type="number" id="pService" value="200">
+            <button class="action-btn" onclick="addPrinter()">Add Printer</button>
         </div>
-        <div id="recipeList"></div>
+        <div id="printerList"></div>
     </div>
 
-    <div id="distributors" class="section"><div id="locationList"></div></div>
-    <div id="pantry" class="section">
+    <div id="library" class="section"><div id="recipeList"></div></div>
+    <div id="orders" class="section">
         <div class="dash-card">
-            <label>New Product</label><input type="text" id="invName">
-            <label>Qty</label><input type="number" id="invStock">
-            <button class="action-btn" onclick="addNewMaterial()">To Warehouse</button>
+            <label>Client</label><input type="text" id="ordClient">
+            <label>Total Price (€)</label><input type="number" id="ordTotal">
+            <button class="action-btn" onclick="createInvoice()">Save Order</button>
         </div>
-        <div id="warehouseDisplay"></div>
+        <div id="invoiceList"></div>
     </div>
-    <div id="workshop" class="section"><div id="printerList"></div></div>
-    <div id="orders" class="section"><div id="invoiceList"></div></div>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
@@ -87,47 +103,71 @@
 
             materials = inv || []; locations = loc || []; recipes = rec || []; filaments = fil || [];
 
-            // 1. Filament Dropdown & List
-            const filSelect = document.getElementById('recFilamentId');
-            if(filSelect) filSelect.innerHTML = filaments.map(f => `<option value="${f.id}">${f.name}</option>`).join("");
+            // Render Filaments for Calc
+            const filSel = document.getElementById('calcFilId');
+            if(filSel) filSel.innerHTML = filaments.map(f => `<option value="${f.id}">${f.name}</option>`).join("");
             
-            const filList = document.getElementById('filamentList');
-            if(filList) filList.innerHTML = filaments.map(f => `<div class="dash-card"><b>🧵 ${f.name}</b><br><small>Cost: €${f.cost_per_kg}/kg</small></div>`).join("");
+            // Render Warehouse
+            const wD = document.getElementById('warehouseDisplay');
+            if(wD) wD.innerHTML = materials.map(m => `<div class="dash-card"><b>${m.name}</b>: ${m.stock_g} in stock</div>`).join("");
 
-            // 2. Recipes Render
-            const rList = document.getElementById('recipeList');
-            if(rList) rList.innerHTML = recipes.map(r => {
-                const f = filaments.find(fil => fil.id === r.filament_id);
-                const cost = f ? (r.grams_used * (f.cost_per_kg/1000)) : 0;
-                return `<div class="dash-card"><b>${r.name}</b><br><small>${r.grams_used}g ${f?f.name:''} | Cost: €${cost.toFixed(2)}</small></div>`;
+            // Render Shops
+            const lD = document.getElementById('locationList');
+            if(lD) lD.innerHTML = locations.map(l => {
+                let items = "";
+                if(l.inventory) {
+                    for(let [n, q] of Object.entries(l.inventory)) {
+                        if(q > 0) items += `<div class="shop-inv-item"><span>${n} (x${q})</span><button onclick="sellItem('${l.id}','${n}')" style="background:var(--money); border:none; border-radius:5px; padding:5px 10px;">SELL</button></div>`;
+                    }
+                }
+                return `<div class="dash-card"><b>🏪 ${l.name}</b><br><small>Commission: ${l.commission}%</small><hr style="opacity:0.1">${items || "No stock."}</div>`;
             }).join("");
 
-            // 3. Shops & Sell Logic
-            const lD = document.getElementById('locationList');
-            if(lD) {
-                lD.innerHTML = locations.map(l => {
-                    let stockItems = "";
-                    if(l.inventory) {
-                        for(let [name, qty] of Object.entries(l.inventory)) {
-                            if(qty > 0) stockItems += `
-                                <div class="shop-inv-item">
-                                    <span>${name} (x${qty})</span>
-                                    <button onclick="sellFromShop('${l.id}', '${name}')" style="background:var(--money); border:none; padding:5px 10px; border-radius:8px; font-weight:bold;">SELL</button>
-                                </div>`;
-                        }
-                    }
-                    return `<div class="dash-card"><b>🏪 ${l.name}</b><br><small>Commission: ${l.commission}%</small><hr style="opacity:0.1">${stockItems || "No stock."}</div>`;
-                }).join("");
-            }
+            // Render Printers
+            const pL = document.getElementById('printerList');
+            if(pL) pL.innerHTML = pnt.map(p => {
+                const prog = (p.hours_since_service / p.service_interval) * 100;
+                return `<div class="dash-card"><b>⚙️ ${p.name}</b> <small>(${p.total_hours.toFixed(1)}h)</small><div class="progress-bg"><div style="width:${Math.min(prog,100)}%; background:${prog>80?'var(--main)':'var(--money)'}; height:100%;"></div></div><button class="action-btn" style="padding:10px" onclick="logWork('${p.id}')">Log Work</button></div>`;
+            }).join("");
 
-            // 4. Printers Render (With Rounding)
-            const pList = document.getElementById('printerList');
-            if(pList) pList.innerHTML = (pnt || []).map(p => `
-                <div class="dash-card">
-                    <b>⚙️ ${p.name}</b> <small>(${p.total_hours.toFixed(1)}h)</small>
-                    <div class="progress-bg"><div style="width:${Math.min((p.hours_since_service/p.service_interval)*100, 100)}%; background:${(p.hours_since_service/p.service_interval)>0.8?'var(--main)':'var(--money)'}; height:100%;"></div></div>
-                    <button class="action-btn" style="padding:10px" onclick="logWork('${p.id}')">Log Work</button>
-                </div>`).join("");
+            // Render Invoices
+            const iL = document.getElementById('invoiceList');
+            if(iL) iL.innerHTML = ivs.map(iv => `<div class="dash-card" style="border-left:4px solid ${iv.status==='Paid'?'var(--money)':'orange'}"><b>${iv.client_name}</b> - €${iv.total_amount.toFixed(2)}</div>`).join("");
+        }
+
+        function runCalc() {
+            const f = filaments.find(f => f.id === document.getElementById('calcFilId').value);
+            let g = parseFloat(document.getElementById('calcG').value) || 0;
+            if(document.getElementById('calcBuf').checked) g *= 1.15;
+            const cost = f ? (g * (f.cost_per_kg/1000)) : 0;
+            document.getElementById('matCost').innerText = `€${cost.toFixed(2)}`;
+            document.getElementById('suggestedPrice').innerText = `€${(cost * 3 + 1).toFixed(2)}`;
+        }
+
+        async function finishPrint() {
+            const name = document.getElementById('calcName').value;
+            const filId = document.getElementById('calcFilId').value;
+            const grams = document.getElementById('calcG').value;
+            if(!name || !grams) return alert("Missing info");
+            await supabaseClient.from('Inventory').insert([{ name, stock_g: 1, category: 'FINISHED' }]);
+            await supabaseClient.from('Recipes').insert([{ name, grams_used: grams, filament_id: filId }]);
+            alert("Added to Warehouse!");
+            loadData();
+        }
+
+        async function sellItem(locId, itemName) {
+            const price = prompt("Sale Price?"); if(!price) return;
+            const loc = locations.find(l => l.id == locId);
+            const rec = recipes.find(r => r.name === itemName);
+            const fil = rec ? filaments.find(f => f.id === rec.filament_id) : null;
+            const cost = fil ? (rec.grams_used * (fil.cost_per_kg/1000)) : 0;
+            const profit = parseFloat(price) * (1 - (loc.commission/100)) - cost;
+            
+            let newInv = loc.inventory; newInv[itemName] -= 1;
+            await supabaseClient.from('Locations').update({ inventory: newInv }).eq('id', locId);
+            await supabaseClient.from('History').insert([{ print_name: `Sale: ${itemName}`, profit: profit }]);
+            alert(`Profit: €${profit.toFixed(2)}`);
+            loadData();
         }
 
         async function addFilament() {
@@ -137,33 +177,13 @@
             loadData();
         }
 
-        async function addRecipe() {
-            const name = document.getElementById('recName').value;
-            const grams = document.getElementById('recGrams').value;
-            const filId = document.getElementById('recFilamentId').value;
-            // Note: Ensure your Recipes table has a filament_id column!
-            await supabaseClient.from('Recipes').insert([{ name, grams_used: grams, filament_id: filId }]);
+        async function addPrinter() {
+            const name = document.getElementById('pName').value;
+            const s = document.getElementById('pService').value;
+            await supabaseClient.from('Printers').insert([{ name, service_interval: s }]);
             loadData();
         }
 
-        async function sellFromShop(locId, itemName) {
-            const price = prompt(`Sale price?`, "5.00");
-            if(!price) return;
-            const loc = locations.find(l => l.id == locId);
-            const recipe = recipes.find(r => r.name === itemName);
-            const filament = recipe ? filaments.find(f => f.id === recipe.filament_id) : null;
-            
-            const materialCost = (recipe && filament) ? (recipe.grams_used * (filament.cost_per_kg/1000)) : 0;
-            const finalProfit = parseFloat(price) * (1 - (loc.commission/100)) - materialCost;
-
-            let newInv = loc.inventory; newInv[itemName] -= 1;
-            await supabaseClient.from('Locations').update({ inventory: newInv }).eq('id', locId);
-            await supabaseClient.from('History').insert([{ print_name: `Sale: ${itemName}`, profit: finalProfit }]);
-            alert(`Net Profit: €${finalProfit.toFixed(2)}`);
-            loadData();
-        }
-
-        // --- COMMON FUNCTIONS ---
         async function logWork(id) {
             const hrs = prompt("Hours?"); if(!hrs) return;
             const { data: p } = await supabaseClient.from('Printers').select('*').eq('id', id).single();
@@ -183,7 +203,7 @@
         function showMenu() {
             document.getElementById('mainMenu').style.display = 'grid';
             document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
-            document.getElementById('appTitle').innerHTML = `WONDERSYNC V9.1`;
+            document.getElementById('appTitle').innerHTML = `WONDERSYNC V10`;
             document.getElementById('backBtn').style.display = 'none';
         }
 
