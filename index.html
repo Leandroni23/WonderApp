@@ -2,22 +2,22 @@
 <html>
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>WonderSync V10 - Master System</title>
+    <title>WonderSync V11 - Enterprise</title>
     <style>
-        :root { --main: #e94560; --bg: #050510; --card: rgba(22, 33, 62, 0.8); --input: #0f0f20; --money: #00ff88; }
+        :root { --main: #e94560; --bg: #050510; --card: rgba(22, 33, 62, 0.9); --input: #0f0f20; --money: #00ff88; --warn: #f39c12; }
         body { background: var(--bg); color: white; font-family: 'Segoe UI', sans-serif; margin: 0; padding-bottom: 80px; }
-        .app-header { background: rgba(15, 52, 96, 0.95); padding: 25px; text-align: center; border-bottom: 2px solid var(--main); position: sticky; top: 0; z-index: 1000; }
-        .back-btn { position: absolute; left: 20px; top: 22px; font-size: 1.8rem; cursor: pointer; display: none; color: var(--main); }
+        .app-header { background: rgba(15, 52, 96, 0.95); padding: 20px; text-align: center; border-bottom: 2px solid var(--main); position: sticky; top: 0; z-index: 1000; }
+        .back-btn { position: absolute; left: 20px; top: 18px; font-size: 1.8rem; cursor: pointer; display: none; color: var(--main); }
         #mainMenu { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding: 15px; }
-        .menu-item { background: var(--card); padding: 25px 10px; border-radius: 20px; text-align: center; border: 1px solid rgba(255,255,255,0.05); }
+        .menu-item { background: var(--card); padding: 25px 10px; border-radius: 20px; text-align: center; border: 1px solid rgba(255,255,255,0.05); cursor: pointer; }
         .section { display: none; padding: 15px; animation: fadeIn 0.3s ease; }
         .section.active { display: block; }
         .dash-card { background: var(--card); border-radius: 20px; padding: 18px; margin-bottom: 12px; border: 1px solid rgba(255,255,255,0.1); }
         input, select { width: 100%; padding: 14px; border-radius: 12px; border: none; background: var(--input); color: white; margin-bottom: 10px; font-size: 1rem; box-sizing: border-box; }
         label { font-size: 0.65rem; color: var(--main); font-weight: 900; text-transform: uppercase; margin-bottom: 4px; display: block; }
         .action-btn { background: var(--main); color: white; border: none; padding: 15px; border-radius: 15px; width: 100%; font-weight: 900; cursor: pointer; }
-        .shop-inv-item { display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.3); padding: 10px; border-radius: 10px; margin-bottom: 8px; border-left: 3px solid var(--money); }
-        .progress-bg { background: var(--input); height: 10px; border-radius: 5px; overflow: hidden; margin: 8px 0; }
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .stat-val { font-size: 1.4rem; font-weight: 900; color: var(--money); }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
@@ -25,64 +25,67 @@
 
     <div class="app-header">
         <span id="backBtn" class="back-btn" onclick="showMenu()">‹</span>
-        <div id="appTitle" style="font-weight: 900; letter-spacing: 2px;">WONDERSYNC <span style="color:var(--main)">V10</span></div>
+        <div id="appTitle" style="font-weight: 900; letter-spacing: 2px;">WONDERSYNC <span style="color:var(--main)">V11</span></div>
     </div>
 
     <div id="mainMenu">
-        <div class="menu-item" onclick="openSection('distributors', 'SHOPS')"><span style="font-size:1.8rem;display:block;">🏪</span>SHOPS</div>
-        <div class="menu-item" onclick="openSection('pantry', 'WAREHOUSE')"><span style="font-size:1.8rem;display:block;">📦</span>WAREHOUSE</div>
-        <div class="menu-item" onclick="openSection('suppliers', 'FILAMENTS')"><span style="font-size:1.8rem;display:block;">🧵</span>FILAMENTS</div>
-        <div class="menu-item" onclick="openSection('workshop', 'PRINTERS')"><span style="font-size:1.8rem;display:block;">⚙️</span>PRINTERS</div>
-        <div class="menu-item" onclick="openSection('library', 'LIBRARY')"><span style="font-size:1.8rem;display:block;">📚</span>LIBRARY</div>
-        <div class="menu-item" onclick="openSection('orders', 'ORDERS')"><span style="font-size:1.8rem;display:block;">🛒</span>ORDERS</div>
+        <div class="menu-item" onclick="openSection('pantry', 'PRODUCT CREATOR')">🎨 CREATOR</div>
+        <div class="menu-item" onclick="openSection('suppliers', 'INVENTORY')">🧵 FILAMENT</div>
+        <div class="menu-item" onclick="openSection('parts', 'PRINTER PARTS')">🔧 PARTS</div>
+        <div class="menu-item" onclick="openSection('distributors', 'FRANCHISE')">🏪 FRANCHISE</div>
+        <div class="menu-item" onclick="openSection('workshop', 'MAINTENANCE')">⚙️ PRINTERS</div>
+        <div class="menu-item" onclick="openSection('pl', 'P&L DATA')">💰 P & L</div>
     </div>
 
     <div id="pantry" class="section">
-        <div class="dash-card" style="border: 1px solid var(--money);">
-            <h3 style="margin-top:0; color:var(--money);">Job Calculator 💰</h3>
+        <div class="dash-card">
+            <h3 style="margin:0 0 15px 0; color:var(--money)">Costing & Profit Calculator</h3>
             <label>Print Name</label><input type="text" id="calcName" placeholder="Iron Man Mask">
-            <label>Select Filament</label><select id="calcFilId" onchange="runCalc()"></select>
-            <label>Print Weight (g)</label><input type="number" id="calcG" oninput="runCalc()">
-            <div style="font-size:0.8rem; margin-bottom:10px;">
-                <input type="checkbox" id="calcBuf" onchange="runCalc()"> +15% Waste Buffer
+            <div class="grid-2">
+                <div><label>Filament</label><select id="calcFilId" onchange="runCosting()"></select></div>
+                <div><label>Weight (g)</label><input type="number" id="calcG" oninput="runCosting()" placeholder="0"></div>
             </div>
-            <div style="background:var(--input); padding:15px; border-radius:12px; text-align:center;">
-                <div id="suggestedPrice" style="font-size:1.8rem; font-weight:900; color:var(--money);">€0.00</div>
-                <small>Material Cost: <span id="matCost">€0.00</span></small>
+            <div class="grid-2">
+                <div><label>Printer Time (Hrs)</label><input type="number" id="calcHrs" oninput="runCosting()" placeholder="0"></div>
+                <div><label>Target Price (€)</label><input type="number" id="targetPrice" oninput="runCosting()" placeholder="0.00"></div>
             </div>
-            <button class="action-btn" style="margin-top:10px; background:var(--money); color:var(--bg);" onclick="finishPrint()">Finish & Add to Warehouse</button>
+            
+            <div style="background:var(--input); padding:15px; border-radius:15px; margin-top:10px;">
+                <div style="display:flex; justify-content:space-between; margin-bottom:5px;">
+                    <span>Real Cost:</span><span id="realCost">€0.00</span>
+                </div>
+                <div style="display:flex; justify-content:space-between; font-weight:bold; color:var(--money);">
+                    <span>Net Profit:</span><span id="netProfit">€0.00</span>
+                </div>
+                <div style="display:flex; justify-content:space-between; font-size:0.8rem; opacity:0.6;">
+                    <span>Margin:</span><span id="marginPerc">0%</span>
+                </div>
+            </div>
+            <button class="action-btn" style="margin-top:15px;" onclick="saveProductToWarehouse()">Add to Finished Stock</button>
         </div>
         <div id="warehouseDisplay"></div>
     </div>
 
+    <div id="parts" class="section">
+        <div class="dash-card">
+            <label>Part Name</label><input type="text" id="partName" placeholder="Nozzle 0.4mm">
+            <label>Stock Quantity</label><input type="number" id="partQty" placeholder="0">
+            <button class="action-btn" onclick="addPart()">Add Part</button>
+        </div>
+        <div id="partsList"></div>
+    </div>
+
+    <div id="suppliers" class="section"><div id="filamentList"></div></div>
     <div id="distributors" class="section"><div id="locationList"></div></div>
-
-    <div id="suppliers" class="section">
-        <div class="dash-card">
-            <label>Roll Name</label><input type="text" id="filName">
-            <label>Price per 1kg Roll</label><input type="number" id="filCost">
-            <button class="action-btn" onclick="addFilament()">Add Filament</button>
+    <div id="workshop" class="section"><div id="printerList"></div></div>
+    <div id="pl" class="section">
+        <div class="dash-card" style="text-align:center;">
+            <label>Company Investment</label>
+            <div class="stat-val" id="totalInvest">€0.00</div>
+            <hr style="opacity:0.1; margin:15px 0;">
+            <label>Net Profit/Loss</label>
+            <div class="stat-val" id="totalNetPL">€0.00</div>
         </div>
-        <div id="filamentList"></div>
-    </div>
-
-    <div id="workshop" class="section">
-        <div class="dash-card">
-            <label>Printer Name</label><input type="text" id="pName">
-            <label>Service Every (Hrs)</label><input type="number" id="pService" value="200">
-            <button class="action-btn" onclick="addPrinter()">Add Printer</button>
-        </div>
-        <div id="printerList"></div>
-    </div>
-
-    <div id="library" class="section"><div id="recipeList"></div></div>
-    <div id="orders" class="section">
-        <div class="dash-card">
-            <label>Client</label><input type="text" id="ordClient">
-            <label>Total Price (€)</label><input type="number" id="ordTotal">
-            <button class="action-btn" onclick="createInvoice()">Save Order</button>
-        </div>
-        <div id="invoiceList"></div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -91,103 +94,48 @@
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InllaXFvdXJmYmRvcm1mZXBydmdxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU2ODM1NTcsImV4cCI6MjA5MTI1OTU1N30.UWLPlGfNquzDYWow85CEztwpEMM9sgHlEeQLLPjRrdc';
         const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-        let materials = [], locations = [], recipes = [], filaments = [];
+        let materials = [], locations = [], filaments = [], parts = [];
 
         async function loadData() {
             const { data: inv } = await supabaseClient.from('Inventory').select('*');
             const { data: loc } = await supabaseClient.from('Locations').select('*');
-            const { data: rec } = await supabaseClient.from('Recipes').select('*');
-            const { data: pnt } = await supabaseClient.from('Printers').select('*');
             const { data: fil } = await supabaseClient.from('Filaments').select('*');
-            const { data: ivs } = await supabaseClient.from('Invoices').select('*').order('created_at', {ascending: false});
+            const { data: pnt } = await supabaseClient.from('Printers').select('*');
+            
+            materials = inv || []; locations = loc || []; filaments = fil || [];
 
-            materials = inv || []; locations = loc || []; recipes = rec || []; filaments = fil || [];
-
-            // Render Filaments for Calc
             const filSel = document.getElementById('calcFilId');
             if(filSel) filSel.innerHTML = filaments.map(f => `<option value="${f.id}">${f.name}</option>`).join("");
             
-            // Render Warehouse
             const wD = document.getElementById('warehouseDisplay');
-            if(wD) wD.innerHTML = materials.map(m => `<div class="dash-card"><b>${m.name}</b>: ${m.stock_g} in stock</div>`).join("");
+            if(wD) wD.innerHTML = materials.map(m => `<div class="dash-card"><b>${m.name}</b>: ${m.stock_g} units</div>`).join("");
 
-            // Render Shops
             const lD = document.getElementById('locationList');
-            if(lD) lD.innerHTML = locations.map(l => {
-                let items = "";
-                if(l.inventory) {
-                    for(let [n, q] of Object.entries(l.inventory)) {
-                        if(q > 0) items += `<div class="shop-inv-item"><span>${n} (x${q})</span><button onclick="sellItem('${l.id}','${n}')" style="background:var(--money); border:none; border-radius:5px; padding:5px 10px;">SELL</button></div>`;
-                    }
-                }
-                return `<div class="dash-card"><b>🏪 ${l.name}</b><br><small>Commission: ${l.commission}%</small><hr style="opacity:0.1">${items || "No stock."}</div>`;
-            }).join("");
-
-            // Render Printers
-            const pL = document.getElementById('printerList');
-            if(pL) pL.innerHTML = pnt.map(p => {
-                const prog = (p.hours_since_service / p.service_interval) * 100;
-                return `<div class="dash-card"><b>⚙️ ${p.name}</b> <small>(${p.total_hours.toFixed(1)}h)</small><div class="progress-bg"><div style="width:${Math.min(prog,100)}%; background:${prog>80?'var(--main)':'var(--money)'}; height:100%;"></div></div><button class="action-btn" style="padding:10px" onclick="logWork('${p.id}')">Log Work</button></div>`;
-            }).join("");
-
-            // Render Invoices
-            const iL = document.getElementById('invoiceList');
-            if(iL) iL.innerHTML = ivs.map(iv => `<div class="dash-card" style="border-left:4px solid ${iv.status==='Paid'?'var(--money)':'orange'}"><b>${iv.client_name}</b> - €${iv.total_amount.toFixed(2)}</div>`).join("");
+            if(lD) lD.innerHTML = locations.map(l => `<div class="dash-card"><b>🏪 ${l.name}</b></div>`).join("");
         }
 
-        function runCalc() {
+        function runCosting() {
             const f = filaments.find(f => f.id === document.getElementById('calcFilId').value);
-            let g = parseFloat(document.getElementById('calcG').value) || 0;
-            if(document.getElementById('calcBuf').checked) g *= 1.15;
-            const cost = f ? (g * (f.cost_per_kg/1000)) : 0;
-            document.getElementById('matCost').innerText = `€${cost.toFixed(2)}`;
-            document.getElementById('suggestedPrice').innerText = `€${(cost * 3 + 1).toFixed(2)}`;
+            const g = parseFloat(document.getElementById('calcG').value) || 0;
+            const hrs = parseFloat(document.getElementById('calcHrs').value) || 0;
+            const target = parseFloat(document.getElementById('targetPrice').value) || 0;
+
+            const filamentCost = f ? (g * (f.cost_per_kg/1000)) : 0;
+            const machineCost = hrs * 1.0; // Your 1€/hr rule
+            const realCost = filamentCost + machineCost;
+            const profit = target - realCost;
+            const margin = target > 0 ? (profit / target) * 100 : 0;
+
+            document.getElementById('realCost').innerText = `€${realCost.toFixed(2)}`;
+            document.getElementById('netProfit').innerText = `€${profit.toFixed(2)}`;
+            document.getElementById('marginPerc').innerText = `${margin.toFixed(0)}%`;
         }
 
-        async function finishPrint() {
+        async function saveProductToWarehouse() {
             const name = document.getElementById('calcName').value;
-            const filId = document.getElementById('calcFilId').value;
-            const grams = document.getElementById('calcG').value;
-            if(!name || !grams) return alert("Missing info");
+            if(!name) return alert("Enter product name");
             await supabaseClient.from('Inventory').insert([{ name, stock_g: 1, category: 'FINISHED' }]);
-            await supabaseClient.from('Recipes').insert([{ name, grams_used: grams, filament_id: filId }]);
             alert("Added to Warehouse!");
-            loadData();
-        }
-
-        async function sellItem(locId, itemName) {
-            const price = prompt("Sale Price?"); if(!price) return;
-            const loc = locations.find(l => l.id == locId);
-            const rec = recipes.find(r => r.name === itemName);
-            const fil = rec ? filaments.find(f => f.id === rec.filament_id) : null;
-            const cost = fil ? (rec.grams_used * (fil.cost_per_kg/1000)) : 0;
-            const profit = parseFloat(price) * (1 - (loc.commission/100)) - cost;
-            
-            let newInv = loc.inventory; newInv[itemName] -= 1;
-            await supabaseClient.from('Locations').update({ inventory: newInv }).eq('id', locId);
-            await supabaseClient.from('History').insert([{ print_name: `Sale: ${itemName}`, profit: profit }]);
-            alert(`Profit: €${profit.toFixed(2)}`);
-            loadData();
-        }
-
-        async function addFilament() {
-            const name = document.getElementById('filName').value;
-            const cost = document.getElementById('filCost').value;
-            await supabaseClient.from('Filaments').insert([{ name, cost_per_kg: cost }]);
-            loadData();
-        }
-
-        async function addPrinter() {
-            const name = document.getElementById('pName').value;
-            const s = document.getElementById('pService').value;
-            await supabaseClient.from('Printers').insert([{ name, service_interval: s }]);
-            loadData();
-        }
-
-        async function logWork(id) {
-            const hrs = prompt("Hours?"); if(!hrs) return;
-            const { data: p } = await supabaseClient.from('Printers').select('*').eq('id', id).single();
-            await supabaseClient.from('Printers').update({ total_hours: p.total_hours + parseFloat(hrs), hours_since_service: p.hours_since_service + parseFloat(hrs) }).eq('id', id);
             loadData();
         }
 
@@ -195,7 +143,7 @@
             document.getElementById('mainMenu').style.display = 'none';
             document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
             document.getElementById(id).classList.add('active');
-            document.getElementById('appTitle').innerHTML = `WS <span style="color:var(--main)">${title}</span>`;
+            document.getElementById('appTitle').innerHTML = title;
             document.getElementById('backBtn').style.display = 'block';
             loadData();
         }
@@ -203,7 +151,7 @@
         function showMenu() {
             document.getElementById('mainMenu').style.display = 'grid';
             document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
-            document.getElementById('appTitle').innerHTML = `WONDERSYNC V10`;
+            document.getElementById('appTitle').innerHTML = `WONDERSYNC V11`;
             document.getElementById('backBtn').style.display = 'none';
         }
 
