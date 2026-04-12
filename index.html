@@ -2,14 +2,14 @@
 <html>
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>WonderSync Pro 8.8</title>
+    <title>WonderSync 8.9</title>
     <style>
         :root { --main: #e94560; --bg: #050510; --card: rgba(22, 33, 62, 0.8); --input: #0f0f20; --money: #00ff88; }
         body { background: var(--bg); color: white; font-family: 'Segoe UI', sans-serif; margin: 0; padding-bottom: 80px; }
         .app-header { background: rgba(15, 52, 96, 0.95); padding: 25px; text-align: center; border-bottom: 2px solid var(--main); position: sticky; top: 0; z-index: 1000; }
         .back-btn { position: absolute; left: 20px; top: 22px; font-size: 1.8rem; cursor: pointer; display: none; color: var(--main); }
         #mainMenu { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding: 15px; }
-        .menu-item { background: var(--card); padding: 25px 10px; border-radius: 20px; text-align: center; border: 1px solid rgba(255,255,255,0.05); cursor: pointer; }
+        .menu-item { background: var(--card); padding: 25px 10px; border-radius: 20px; text-align: center; border: 1px solid rgba(255,255,255,0.05); }
         .section { display: none; padding: 15px; animation: fadeIn 0.3s ease; }
         .section.active { display: block; }
         .dash-card { background: var(--card); border-radius: 20px; padding: 20px; margin-bottom: 15px; border: 1px solid rgba(255,255,255,0.1); }
@@ -37,9 +37,19 @@
         <div class="menu-item" onclick="openSection('orders', 'ORDERS')"><span style="font-size:2rem;display:block;">🛒</span>ORDERS</div>
     </div>
 
+    <div id="orders" class="section">
+        <div class="dash-card">
+            <label>Client / Shop</label><input type="text" id="invClient">
+            <label>Description</label><input type="text" id="invDesc">
+            <label>Total Price (€)</label><input type="number" id="invTotal">
+            <button class="action-btn" onclick="createInvoice()">Save Invoice</button>
+        </div>
+        <div id="invoiceList"></div>
+    </div>
+
     <div id="workshop" class="section">
         <div class="dash-card">
-            <label>Printer Name</label><input type="text" id="pName" placeholder="Wonder 1.0">
+            <label>Printer Name</label><input type="text" id="pName">
             <label>Service Every (Hours)</label><input type="number" id="pService" value="200">
             <button class="action-btn" onclick="addPrinter()">Register Printer</button>
         </div>
@@ -47,13 +57,9 @@
     </div>
 
     <div id="distributors" class="section"><div id="locationList"></div></div>
-    <div id="pantry" class="section">
-        <div id="warehouseDisplay"></div>
-    </div>
-    
-    <div id="suppliers" class="section"><h3>Supplier Hub</h3></div>
-    <div id="library" class="section"><h3>STL Library</h3></div>
-    <div id="orders" class="section"><h3>Customer Orders</h3></div>
+    <div id="pantry" class="section"><div id="warehouseDisplay"></div></div>
+    <div id="suppliers" class="section"><h3>Suppliers coming next...</h3></div>
+    <div id="library" class="section"><h3>Library coming next...</h3></div>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
@@ -62,54 +68,71 @@
         const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
         async function loadData() {
-            const { data: printers } = await supabaseClient.from('Printers').select('*');
+            const { data: p } = await supabaseClient.from('Printers').select('*');
+            const { data: i } = await supabaseClient.from('Invoices').select('*').order('created_at', {ascending: false});
             const { data: inv } = await supabaseClient.from('Inventory').select('*');
             const { data: loc } = await supabaseClient.from('Locations').select('*');
 
+            // Render Printers (with rounding)
             const pList = document.getElementById('printerList');
             if(pList) {
-                pList.innerHTML = "";
-                (printers || []).forEach(p => {
-                    const prog = (p.hours_since_service / p.service_interval) * 100;
-                    pList.innerHTML += `
+                pList.innerHTML = (p || []).map(printer => {
+                    const prog = (printer.hours_since_service / printer.service_interval) * 100;
+                    return `
                     <div class="dash-card">
-                        <div style="display:flex; justify-content:space-between; align-items:center;">
-                            <b>⚙️ ${p.name}</b>
-                            <span style="font-size:0.8rem; opacity:0.6;">Total: ${p.total_hours}h</span>
+                        <div style="display:flex; justify-content:space-between;">
+                            <b>⚙️ ${printer.name}</b>
+                            <span style="font-size:0.8rem;">${printer.total_hours.toFixed(1)}h</span>
                         </div>
-                        <div class="progress-bg"><div class="progress-fill" style="width:${Math.min(prog, 100)}%; background:${prog > 80 ? 'var(--main)':'var(--money)'};"></div></div>
-                        <button class="action-btn" style="padding:10px; font-size:0.8rem;" onclick="logWork('${p.id}')">+ Log Work</button>
+                        <div class="progress-bg"><div class="progress-fill" style="width:${Math.min(prog,100)}%; background:${prog > 80 ? 'var(--main)':'var(--money)'};"></div></div>
+                        <button class="action-btn" style="padding:10px;" onclick="logWork('${printer.id}')">+ Log Work</button>
                     </div>`;
-                });
+                }).join("");
             }
 
-            const wD = document.getElementById('warehouseDisplay');
-            if(wD) {
-                wD.innerHTML = (inv || []).map(m => `<div class="dash-card"><b>${m.name}</b>: ${m.stock_g} pcs</div>`).join("");
+            // Render Invoices
+            const iList = document.getElementById('invoiceList');
+            if(iList) {
+                iList.innerHTML = "<h3>Invoice History</h3>" + (i || []).map(invc => `
+                    <div class="dash-card" style="border-left:4px solid ${invc.status==='Paid'?'var(--money)':'orange'}">
+                        <div style="display:flex; justify-content:space-between;">
+                            <b>#${invc.invoice_number} ${invc.client_name}</b>
+                            <b style="color:var(--money)">€${invc.total_amount.toFixed(2)}</b>
+                        </div>
+                        <p style="font-size:0.8rem; opacity:0.7;">${invc.items?.description || ''}</p>
+                        <button onclick="markAsPaid('${invc.id}')" style="background:none; border:1px solid var(--money); color:var(--money); padding:5px 10px; border-radius:8px; font-size:0.7rem;">Mark Paid</button>
+                    </div>`).join("");
             }
+        }
 
-            const lD = document.getElementById('locationList');
-            if(lD) {
-                lD.innerHTML = (loc || []).map(l => `<div class="dash-card"><b>🏪 ${l.name}</b></div>`).join("");
-            }
+        async function createInvoice() {
+            const client = document.getElementById('invClient').value;
+            const desc = document.getElementById('invDesc').value;
+            const total = document.getElementById('invTotal').value;
+            if(!client || !total) return alert("Fill details!");
+            await supabaseClient.from('Invoices').insert([{ client_name: client, items: {description: desc}, total_amount: parseFloat(total) }]);
+            loadData();
+        }
+
+        async function markAsPaid(id) {
+            await supabaseClient.from('Invoices').update({ status: 'Paid' }).eq('id', id);
+            loadData();
         }
 
         async function addPrinter() {
             const name = document.getElementById('pName').value;
             const service = document.getElementById('pService').value;
-            if(!name) return;
             await supabaseClient.from('Printers').insert([{ name, service_interval: service }]);
-            document.getElementById('pName').value = "";
             loadData();
         }
 
         async function logWork(id) {
-            const hrs = prompt("Job Hours?", "5");
+            const hrs = prompt("Hours?");
             if(!hrs) return;
-            const { data: p } = await supabaseClient.from('Printers').select('*').eq('id', id).single();
+            const { data: printer } = await supabaseClient.from('Printers').select('*').eq('id', id).single();
             await supabaseClient.from('Printers').update({ 
-                total_hours: (p.total_hours || 0) + parseFloat(hrs),
-                hours_since_service: (p.hours_since_service || 0) + parseFloat(hrs)
+                total_hours: (printer.total_hours || 0) + parseFloat(hrs),
+                hours_since_service: (printer.hours_since_service || 0) + parseFloat(hrs)
             }).eq('id', id);
             loadData();
         }
