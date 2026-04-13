@@ -2,23 +2,30 @@
 <html>
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>WonderSync MASTER</title>
+    <title>WonderSync Enterprise</title>
     <style>
         :root { --main: #e94560; --bg: #050510; --card: rgba(22, 33, 62, 0.9); --input: #0f0f20; --money: #00ff88; }
         body { background: var(--bg); color: white; font-family: 'Segoe UI', sans-serif; margin: 0; padding-bottom: 80px; }
         .app-header { background: rgba(15, 52, 96, 0.95); padding: 20px; text-align: center; border-bottom: 2px solid var(--main); position: sticky; top: 0; z-index: 1000; }
         .back-btn { position: absolute; left: 20px; top: 18px; font-size: 1.8rem; cursor: pointer; display: none; color: var(--main); }
-        #mainMenu { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding: 15px; }
-        .menu-item { background: var(--card); padding: 25px 10px; border-radius: 20px; text-align: center; border: 1px solid rgba(255,255,255,0.05); cursor: pointer; font-weight: bold; }
+        
+        /* Dashboard Grid */
+        .dash-section-title { padding: 15px 15px 5px; font-size: 0.7rem; letter-spacing: 2px; color: var(--main); font-weight: 900; }
+        .menu-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding: 15px; }
+        .menu-item { background: var(--card); padding: 20px 10px; border-radius: 15px; text-align: center; border: 1px solid rgba(255,255,255,0.05); cursor: pointer; }
+        .menu-item i { font-size: 1.5rem; display: block; margin-bottom: 8px; }
+        
+        /* Sections */
         .section { display: none; padding: 15px; animation: fadeIn 0.3s ease; }
         .section.active { display: block; }
-        .dash-card { background: var(--card); border-radius: 20px; padding: 18px; margin-bottom: 12px; border: 1px solid rgba(255,255,255,0.1); }
+        .card { background: var(--card); border-radius: 20px; padding: 18px; margin-bottom: 12px; border: 1px solid rgba(255,255,255,0.1); }
+        
+        /* Forms */
         input, select { width: 100%; padding: 14px; border-radius: 12px; border: none; background: var(--input); color: white; margin-bottom: 10px; font-size: 1rem; box-sizing: border-box; }
         label { font-size: 0.65rem; color: var(--main); font-weight: 900; text-transform: uppercase; margin-bottom: 4px; display: block; }
-        .action-btn { background: var(--main); color: white; border: none; padding: 15px; border-radius: 15px; width: 100%; font-weight: 900; cursor: pointer; }
-        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-        .progress-bg { background: var(--input); height: 10px; border-radius: 5px; overflow: hidden; margin: 8px 0; }
-        .shop-inv-item { display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.3); padding: 10px; border-radius: 10px; margin-bottom: 8px; border-left: 3px solid var(--money); }
+        .btn { background: var(--main); color: white; border: none; padding: 15px; border-radius: 15px; width: 100%; font-weight: 900; cursor: pointer; }
+        .btn-money { background: var(--money); color: black; }
+        
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
@@ -26,170 +33,115 @@
 
     <div class="app-header">
         <span id="backBtn" class="back-btn" onclick="showMenu()">‹</span>
-        <div id="appTitle" style="font-weight: 900; letter-spacing: 2px;">WONDERSYNC <span style="color:var(--main)">MASTER</span></div>
+        <div id="appTitle" style="font-weight: 900; letter-spacing: 2px;">WONDERSYNC <span style="color:var(--main)">V12</span></div>
     </div>
 
     <div id="mainMenu">
-        <div class="menu-item" onclick="openSection('creator', 'JOB CALCULATOR')">💰 CALCULATOR</div>
-        <div class="menu-item" onclick="openSection('pantry', 'WAREHOUSE')">📦 WAREHOUSE</div>
-        <div class="menu-item" onclick="openSection('suppliers', 'FILAMENTS')">🧵 FILAMENTS</div>
-        <div class="menu-item" onclick="openSection('workshop', 'PRINTERS')">⚙️ PRINTERS</div>
-        <div class="menu-item" onclick="openSection('distributors', 'SHOPS')">🏪 SHOPS</div>
-        <div class="menu-item" onclick="openSection('pl', 'P&L DATA')">📊 P&L HISTORY</div>
+        <div class="dash-section-title">INTERNAL OPS & CREATOR</div>
+        <div class="menu-grid">
+            <div class="menu-item" onclick="openSection('sec-calc', 'COST CALCULATOR')">⚖️ Pricing</div>
+            <div class="menu-item" onclick="openSection('sec-fil', 'FILAMENT INV')">🧵 Filament</div>
+            <div class="menu-item" onclick="openSection('sec-parts', 'PARTS & SUPPLIES')">🔧 Parts</div>
+            <div class="menu-item" onclick="openSection('sec-ware', 'WAREHOUSE')">📦 Warehouse</div>
+        </div>
+
+        <div class="dash-section-title">FRANCHISE & BI</div>
+        <div class="menu-grid">
+            <div class="menu-item" onclick="openSection('sec-fran', 'LOCATIONS')">🏪 Franchise</div>
+            <div class="menu-item" onclick="openSection('sec-maint', 'MAINTENANCE')">⚙️ Printers</div>
+            <div class="menu-item" onclick="openSection('sec-pl', 'P&L DATA')">💰 Profit/Loss</div>
+            <div class="menu-item" onclick="openSection('sec-invest', 'INVESTMENT')">🏛️ Investment</div>
+        </div>
     </div>
 
-    <div id="creator" class="section">
-        <div class="dash-card">
-            <label>Order Name</label><input type="text" id="calcName">
-            <label>Select Filament</label><select id="calcFilId" onchange="runLiveCalc()"></select>
-            <div class="grid-2">
-                <div><label>Weight (g)</label><input type="number" id="calcG" oninput="runLiveCalc()"></div>
-                <div><label>Time (Hrs)</label><input type="number" id="calcHrs" oninput="runLiveCalc()"></div>
+    <div id="sec-calc" class="section">
+        <div class="card">
+            <label>Filament Used</label><select id="calcFil"></select>
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+                <div><label>Weight (g)</label><input type="number" id="calcG" oninput="runCalc()"></div>
+                <div><label>Time (Hrs)</label><input type="number" id="calcH" oninput="runCalc()"></div>
             </div>
-            <label>Margin %</label><input type="number" id="marginGoal" value="60" oninput="runLiveCalc()">
-            <div style="background:var(--input); padding:15px; border-radius:12px; text-align:center;">
-                <div id="suggestedPrice" style="font-size:1.8rem; font-weight:900; color:var(--money);">€0.00</div>
-                <small>Cost: <span id="realCost">€0.00</span></small>
+            <div style="background:var(--input); padding:15px; border-radius:15px; text-align:center;">
+                <label>Real Cost (Fil + €1/hr)</label>
+                <div id="res-cost" style="font-size:1.5rem; font-weight:bold;">€0.00</div>
             </div>
-            <button class="action-btn" style="margin-top:10px; background:var(--money); color:black;" onclick="saveCalcOrder()">Save & Create Invoice</button>
         </div>
     </div>
 
-    <div id="pantry" class="section">
-        <div class="dash-card">
-            <label>Product Name</label><input type="text" id="newProdName">
-            <label>Qty</label><input type="number" id="newProdQty">
-            <button class="action-btn" onclick="addWarehouseItem()">Add to Stock</button>
+    <div id="sec-fil" class="section">
+        <div class="card">
+            <label>New Spool Name</label><input type="text" id="fn">
+            <label>Price per kg</label><input type="number" id="fc">
+            <button class="btn" onclick="saveFilament()">Add to Inventory</button>
         </div>
-        <div id="warehouseDisplay"></div>
+        <div id="filList"></div>
     </div>
 
-    <div id="suppliers" class="section">
-        <div class="dash-card">
-            <label>Filament Name</label><input type="text" id="filName">
-            <label>Cost per 1kg Roll (€)</label><input type="number" id="filCost">
-            <button class="action-btn" onclick="addFilament()">Add Roll</button>
-        </div>
-        <div id="filamentList"></div>
+    <div id="sec-maint" class="section">
+        <div id="printList"></div>
     </div>
 
-    <div id="workshop" class="section">
-        <div id="printerList"></div>
-    </div>
-
-    <div id="distributors" class="section">
-        <div id="locationList"></div>
-    </div>
-
-    <div id="pl" class="section">
-        <div id="invoiceList"></div>
-    </div>
+    <div id="sec-parts" class="section"><div class="card">🔧 Parts tracking coming in next step...</div></div>
+    <div id="sec-ware" class="section"><div class="card">📦 Warehouse stock coming in next step...</div></div>
+    <div id="sec-fran" class="section"><div class="card">🏪 Franchise data coming in next step...</div></div>
+    <div id="sec-pl" class="section"><div class="card">💰 P&L history coming in next step...</div></div>
+    <div id="sec-invest" class="section"><div class="card">🏛️ Investment tracking coming in next step...</div></div>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
         const SUPABASE_URL = 'https://yeiqourfbdormfeprvgq.supabase.co';
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InllaXFvdXJmYmRvcm1mZXBydmdxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU2ODM1NTcsImV4cCI6MjA5MTI1OTU1N30.UWLPlGfNquzDYWow85CEztwpEMM9sgHlEeQLLPjRrdc';
-        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-        let materials = [], locations = [], filaments = [], printers = [];
+        let filaments = [];
 
-        async function loadData() {
-            const { data: inv } = await supabaseClient.from('Inventory').select('*');
-            const { data: loc } = await supabaseClient.from('Locations').select('*');
-            const { data: fil } = await supabaseClient.from('Filaments').select('*');
-            const { data: pnt } = await supabaseClient.from('Printers').select('*');
-            const { data: ivs } = await supabaseClient.from('Invoices').select('*').order('created_at', {ascending: false});
-
-            materials = inv || []; locations = loc || []; filaments = fil || []; printers = pnt || [];
-
-            // Filaments
-            document.getElementById('calcFilId').innerHTML = filaments.map(f => `<option value="${f.id}">${f.name}</option>`).join("");
-            document.getElementById('filamentList').innerHTML = filaments.map(f => `<div class="dash-card"><b>🧵 ${f.name}</b>: €${f.cost_per_kg}/kg</div>`).join("");
-
-            // Warehouse
-            document.getElementById('warehouseDisplay').innerHTML = materials.map(m => `<div class="dash-card"><b>📦 ${m.name}</b>: ${m.stock_g} units</div>`).join("");
-
-            // Shops
-            document.getElementById('locationList').innerHTML = locations.map(l => {
-                let s = ""; if(l.inventory) for(let [n, q] of Object.entries(l.inventory)) if(q > 0) s += `<div class="shop-inv-item"><span>${n} (x${q})</span><button onclick="sell('${l.id}','${n}')" style="background:var(--money); border:none; padding:5px; border-radius:5px;">SELL</button></div>`;
-                return `<div class="dash-card"><b>🏪 ${l.name}</b><hr style="opacity:0.1">${s || "Empty"}</div>`;
-            }).join("");
-
-            // Printers
-            document.getElementById('printerList').innerHTML = printers.map(p => {
-                const prog = (p.hours_since_service / p.service_interval) * 100;
-                return `<div class="dash-card"><b>⚙️ ${p.name}</b> <small>(${p.total_hours.toFixed(1)}h)</small><div class="progress-bg"><div style="width:${Math.min(prog,100)}%; background:${prog>80?'var(--main)':'var(--money)'}; height:100%;"></div></div><button class="action-btn" style="padding:10px" onclick="logHrs('${p.id}')">Add Hours</button></div>`;
-            }).join("");
-
-            // P&L
-            document.getElementById('invoiceList').innerHTML = (ivs || []).map(i => `<div class="dash-card"><b>${i.client_name}</b>: €${i.total_amount.toFixed(2)}</div>`).join("");
+        async function init() {
+            const { data: f } = await supabase.from('Filaments').select('*');
+            const { data: p } = await supabase.from('Printers').select('*');
+            filaments = f || [];
+            
+            // Populate Calculator Dropdown
+            document.getElementById('calcFil').innerHTML = filaments.map(x => `<option value="${x.cost_per_kg}">${x.name}</option>`).join('');
+            
+            // Populate Filament List
+            document.getElementById('filList').innerHTML = filaments.map(x => `<div class="card"><b>${x.name}</b>: €${x.cost_per_kg}/kg</div>`).join('');
+            
+            // Populate Printers
+            document.getElementById('printList').innerHTML = (p || []).map(x => `<div class="card"><b>${x.name}</b><br><small>${x.total_hours}h total</small></div>`).join('');
         }
 
-        function runLiveCalc() {
-            const f = filaments.find(f => f.id === document.getElementById('calcFilId').value);
-            const g = parseFloat(document.getElementById('calcG').value) || 0;
-            const hrs = parseFloat(document.getElementById('calcHrs').value) || 0;
-            const m = parseFloat(document.getElementById('marginGoal').value) || 0;
-            const cost = (f ? (g * (f.cost_per_kg / 1000)) : 0) + (hrs * 1.0);
-            const price = cost / (1 - (m / 100));
-            document.getElementById('realCost').innerText = `€${cost.toFixed(2)}`;
-            document.getElementById('suggestedPrice').innerText = `€${price.toFixed(2)}`;
+        function runCalc() {
+            const costPerKg = parseFloat(document.getElementById('calcFil').value) || 0;
+            const grams = parseFloat(document.getElementById('calcG').value) || 0;
+            const hrs = parseFloat(document.getElementById('calcH').value) || 0;
+            const final = (grams * (costPerKg / 1000)) + (hrs * 1.0);
+            document.getElementById('res-cost').innerText = `€${final.toFixed(2)}`;
         }
 
-        async function saveCalcOrder() {
-            const n = document.getElementById('calcName').value;
-            const p = document.getElementById('suggestedPrice').innerText.replace('€', '');
-            await supabaseClient.from('Invoices').insert([{ client_name: n, total_amount: parseFloat(p), status: 'Paid' }]);
-            alert("Order Invoiced!"); loadData(); showMenu();
-        }
-
-        async function addFilament() {
-            const n = document.getElementById('filName').value;
-            const c = document.getElementById('filCost').value;
-            await supabaseClient.from('Filaments').insert([{ name: n, cost_per_kg: c }]);
-            loadData();
-        }
-
-        async function addWarehouseItem() {
-            const n = document.getElementById('newProdName').value;
-            const q = document.getElementById('newProdQty').value;
-            await supabaseClient.from('Inventory').insert([{ name: n, stock_g: q }]);
-            loadData();
-        }
-
-        async function logHrs(id) {
-            const h = prompt("Hours?");
-            const { data: p } = await supabaseClient.from('Printers').select('*').eq('id', id).single();
-            await supabaseClient.from('Printers').update({ total_hours: p.total_hours + parseFloat(h), hours_since_service: p.hours_since_service + parseFloat(h) }).eq('id', id);
-            loadData();
-        }
-
-        async function sell(locId, item) {
-            const price = prompt("Price?");
-            const loc = locations.find(l => l.id == locId);
-            let inv = loc.inventory; inv[item] -= 1;
-            await supabaseClient.from('Locations').update({ inventory: inv }).eq('id', locId);
-            await supabaseClient.from('Invoices').insert([{ client_name: `Sale: ${item}`, total_amount: parseFloat(price) }]);
-            loadData();
+        async function saveFilament() {
+            const name = document.getElementById('fn').value;
+            const cost = document.getElementById('fc').value;
+            await supabase.from('Filaments').insert([{ name, cost_per_kg: cost }]);
+            init();
         }
 
         function openSection(id, title) {
             document.getElementById('mainMenu').style.display = 'none';
             document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
             document.getElementById(id).classList.add('active');
-            document.getElementById('appTitle').innerHTML = title;
+            document.getElementById('appTitle').innerText = title;
             document.getElementById('backBtn').style.display = 'block';
-            loadData();
+            init();
         }
 
         function showMenu() {
-            document.getElementById('mainMenu').style.display = 'grid';
+            document.getElementById('mainMenu').style.display = 'block';
             document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
-            document.getElementById('appTitle').innerHTML = `WONDERSYNC MASTER`;
+            document.getElementById('appTitle').innerHTML = 'WONDERSYNC <span style="color:#e94560">V12</span>';
             document.getElementById('backBtn').style.display = 'none';
         }
 
-        loadData();
+        init();
     </script>
 </body>
 </html>
