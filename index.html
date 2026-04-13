@@ -2,9 +2,9 @@
 <html>
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>WonderSync V11.2 - Precision Calculator</title>
+    <title>WonderSync MASTER</title>
     <style>
-        :root { --main: #e94560; --bg: #050510; --card: rgba(22, 33, 62, 0.9); --input: #0f0f20; --money: #00ff88; --warn: #f39c12; }
+        :root { --main: #e94560; --bg: #050510; --card: rgba(22, 33, 62, 0.9); --input: #0f0f20; --money: #00ff88; }
         body { background: var(--bg); color: white; font-family: 'Segoe UI', sans-serif; margin: 0; padding-bottom: 80px; }
         .app-header { background: rgba(15, 52, 96, 0.95); padding: 20px; text-align: center; border-bottom: 2px solid var(--main); position: sticky; top: 0; z-index: 1000; }
         .back-btn { position: absolute; left: 20px; top: 18px; font-size: 1.8rem; cursor: pointer; display: none; color: var(--main); }
@@ -17,8 +17,8 @@
         label { font-size: 0.65rem; color: var(--main); font-weight: 900; text-transform: uppercase; margin-bottom: 4px; display: block; }
         .action-btn { background: var(--main); color: white; border: none; padding: 15px; border-radius: 15px; width: 100%; font-weight: 900; cursor: pointer; }
         .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-        .stat-box { background: var(--input); padding: 12px; border-radius: 12px; text-align: center; }
-        .money-text { color: var(--money); font-weight: 900; font-size: 1.2rem; }
+        .progress-bg { background: var(--input); height: 10px; border-radius: 5px; overflow: hidden; margin: 8px 0; }
+        .shop-inv-item { display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.3); padding: 10px; border-radius: 10px; margin-bottom: 8px; border-left: 3px solid var(--money); }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
@@ -26,56 +26,64 @@
 
     <div class="app-header">
         <span id="backBtn" class="back-btn" onclick="showMenu()">‹</span>
-        <div id="appTitle" style="font-weight: 900; letter-spacing: 2px;">WONDERSYNC <span style="color:var(--main)">PRICING</span></div>
+        <div id="appTitle" style="font-weight: 900; letter-spacing: 2px;">WONDERSYNC <span style="color:var(--main)">MASTER</span></div>
     </div>
 
     <div id="mainMenu">
         <div class="menu-item" onclick="openSection('creator', 'JOB CALCULATOR')">💰 CALCULATOR</div>
-        <div class="menu-item" onclick="openSection('suppliers', 'FILAMENTS')">🧵 FILAMENT</div>
-        <div class="menu-item" onclick="openSection('distributors', 'SHOPS')">🏪 SHOPS</div>
+        <div class="menu-item" onclick="openSection('pantry', 'WAREHOUSE')">📦 WAREHOUSE</div>
+        <div class="menu-item" onclick="openSection('suppliers', 'FILAMENTS')">🧵 FILAMENTS</div>
         <div class="menu-item" onclick="openSection('workshop', 'PRINTERS')">⚙️ PRINTERS</div>
-        <div class="menu-item" onclick="openSection('parts', 'PARTS')">🔧 PARTS</div>
-        <div class="menu-item" onclick="openSection('pl', 'P&L')">📊 P&L</div>
+        <div class="menu-item" onclick="openSection('distributors', 'SHOPS')">🏪 SHOPS</div>
+        <div class="menu-item" onclick="openSection('pl', 'P&L DATA')">📊 P&L HISTORY</div>
     </div>
 
     <div id="creator" class="section">
-        <div class="dash-card" style="border: 2px solid var(--money);">
-            <h3 style="margin:0 0 15px 0;">New Order Price 🧾</h3>
-            <label>Order Name</label><input type="text" id="calcName" placeholder="Client X - Mask">
-            
-            <label>Filament Choice</label>
-            <select id="calcFilId" onchange="runLiveCalc()"></select>
-            
+        <div class="dash-card">
+            <label>Order Name</label><input type="text" id="calcName">
+            <label>Select Filament</label><select id="calcFilId" onchange="runLiveCalc()"></select>
             <div class="grid-2">
-                <div><label>Weight (Grams)</label><input type="number" id="calcG" oninput="runLiveCalc()" value="0"></div>
-                <div><label>Print Time (Hours)</label><input type="number" id="calcHrs" oninput="runLiveCalc()" value="0"></div>
+                <div><label>Weight (g)</label><input type="number" id="calcG" oninput="runLiveCalc()"></div>
+                <div><label>Time (Hrs)</label><input type="number" id="calcHrs" oninput="runLiveCalc()"></div>
             </div>
-
-            <label>Desired Profit Margin (%)</label>
-            <input type="number" id="marginInput" oninput="runLiveCalc()" value="60">
-
-            <div style="margin-top:20px; display:grid; gap:10px;">
-                <div class="stat-box">
-                    <label>Real Production Cost</label>
-                    <div id="realCost" class="money-text" style="color:white;">€0.00</div>
-                    <small style="font-size:0.6rem; opacity:0.6;">(Filament + €1/hr Machine)</small>
-                </div>
-                <div class="stat-box" style="border: 1px solid var(--money);">
-                    <label>Suggested Retail Price</label>
-                    <div id="suggestedPrice" class="money-text">€0.00</div>
-                    <small style="font-size:0.6rem; opacity:0.6;">(To hit your % margin)</small>
-                </div>
+            <label>Margin %</label><input type="number" id="marginGoal" value="60" oninput="runLiveCalc()">
+            <div style="background:var(--input); padding:15px; border-radius:12px; text-align:center;">
+                <div id="suggestedPrice" style="font-size:1.8rem; font-weight:900; color:var(--money);">€0.00</div>
+                <small>Cost: <span id="realCost">€0.00</span></small>
             </div>
-
-            <button class="action-btn" style="margin-top:20px; background:var(--money); color:black;" onclick="saveAndInvoice()">Accept Order & Create Invoice</button>
+            <button class="action-btn" style="margin-top:10px; background:var(--money); color:black;" onclick="saveCalcOrder()">Save & Create Invoice</button>
         </div>
     </div>
 
-    <div id="suppliers" class="section"><div id="filamentList"></div></div>
-    <div id="distributors" class="section"><div id="locationList"></div></div>
-    <div id="workshop" class="section"><div id="printerList"></div></div>
-    <div id="parts" class="section"><div id="partsList"></div></div>
-    <div id="pl" class="section"><div id="invoiceList"></div></div>
+    <div id="pantry" class="section">
+        <div class="dash-card">
+            <label>Product Name</label><input type="text" id="newProdName">
+            <label>Qty</label><input type="number" id="newProdQty">
+            <button class="action-btn" onclick="addWarehouseItem()">Add to Stock</button>
+        </div>
+        <div id="warehouseDisplay"></div>
+    </div>
+
+    <div id="suppliers" class="section">
+        <div class="dash-card">
+            <label>Filament Name</label><input type="text" id="filName">
+            <label>Cost per 1kg Roll (€)</label><input type="number" id="filCost">
+            <button class="action-btn" onclick="addFilament()">Add Roll</button>
+        </div>
+        <div id="filamentList"></div>
+    </div>
+
+    <div id="workshop" class="section">
+        <div id="printerList"></div>
+    </div>
+
+    <div id="distributors" class="section">
+        <div id="locationList"></div>
+    </div>
+
+    <div id="pl" class="section">
+        <div id="invoiceList"></div>
+    </div>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
@@ -83,56 +91,86 @@
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InllaXFvdXJmYmRvcm1mZXBydmdxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU2ODM1NTcsImV4cCI6MjA5MTI1OTU1N30.UWLPlGfNquzDYWow85CEztwpEMM9sgHlEeQLLPjRrdc';
         const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-        let filaments = [], printers = [], locations = [];
+        let materials = [], locations = [], filaments = [], printers = [];
 
         async function loadData() {
+            const { data: inv } = await supabaseClient.from('Inventory').select('*');
+            const { data: loc } = await supabaseClient.from('Locations').select('*');
             const { data: fil } = await supabaseClient.from('Filaments').select('*');
             const { data: pnt } = await supabaseClient.from('Printers').select('*');
-            const { data: loc } = await supabaseClient.from('Locations').select('*');
             const { data: ivs } = await supabaseClient.from('Invoices').select('*').order('created_at', {ascending: false});
 
-            filaments = fil || []; printers = pnt || []; locations = loc || [];
+            materials = inv || []; locations = loc || []; filaments = fil || []; printers = pnt || [];
 
-            const filSel = document.getElementById('calcFilId');
-            if(filSel) filSel.innerHTML = filaments.map(f => `<option value="${f.id}">${f.name} (€${f.cost_per_kg}/kg)</option>`).join("");
-            
-            const iList = document.getElementById('invoiceList');
-            if(iList) iList.innerHTML = (ivs || []).map(i => `<div class="dash-card"><b>${i.client_name}</b>: €${i.total_amount.toFixed(2)}</div>`).join("");
-            
-            runLiveCalc();
+            // Filaments
+            document.getElementById('calcFilId').innerHTML = filaments.map(f => `<option value="${f.id}">${f.name}</option>`).join("");
+            document.getElementById('filamentList').innerHTML = filaments.map(f => `<div class="dash-card"><b>🧵 ${f.name}</b>: €${f.cost_per_kg}/kg</div>`).join("");
+
+            // Warehouse
+            document.getElementById('warehouseDisplay').innerHTML = materials.map(m => `<div class="dash-card"><b>📦 ${m.name}</b>: ${m.stock_g} units</div>`).join("");
+
+            // Shops
+            document.getElementById('locationList').innerHTML = locations.map(l => {
+                let s = ""; if(l.inventory) for(let [n, q] of Object.entries(l.inventory)) if(q > 0) s += `<div class="shop-inv-item"><span>${n} (x${q})</span><button onclick="sell('${l.id}','${n}')" style="background:var(--money); border:none; padding:5px; border-radius:5px;">SELL</button></div>`;
+                return `<div class="dash-card"><b>🏪 ${l.name}</b><hr style="opacity:0.1">${s || "Empty"}</div>`;
+            }).join("");
+
+            // Printers
+            document.getElementById('printerList').innerHTML = printers.map(p => {
+                const prog = (p.hours_since_service / p.service_interval) * 100;
+                return `<div class="dash-card"><b>⚙️ ${p.name}</b> <small>(${p.total_hours.toFixed(1)}h)</small><div class="progress-bg"><div style="width:${Math.min(prog,100)}%; background:${prog>80?'var(--main)':'var(--money)'}; height:100%;"></div></div><button class="action-btn" style="padding:10px" onclick="logHrs('${p.id}')">Add Hours</button></div>`;
+            }).join("");
+
+            // P&L
+            document.getElementById('invoiceList').innerHTML = (ivs || []).map(i => `<div class="dash-card"><b>${i.client_name}</b>: €${i.total_amount.toFixed(2)}</div>`).join("");
         }
 
         function runLiveCalc() {
             const f = filaments.find(f => f.id === document.getElementById('calcFilId').value);
             const g = parseFloat(document.getElementById('calcG').value) || 0;
             const hrs = parseFloat(document.getElementById('calcHrs').value) || 0;
-            const marginGoal = parseFloat(document.getElementById('marginInput').value) || 0;
-
-            const filamentCost = f ? (g * (f.cost_per_kg / 1000)) : 0;
-            const machineCost = hrs * 1.0; // The €1/hr rule
-            const totalProductionCost = filamentCost + machineCost;
-
-            // Math to find price based on Margin: Price = Cost / (1 - Margin%)
-            const multiplier = 1 - (marginGoal / 100);
-            const suggestedPrice = multiplier > 0 ? (totalProductionCost / multiplier) : totalProductionCost;
-
-            document.getElementById('realCost').innerText = `€${totalProductionCost.toFixed(2)}`;
-            document.getElementById('suggestedPrice').innerText = `€${suggestedPrice.toFixed(2)}`;
+            const m = parseFloat(document.getElementById('marginGoal').value) || 0;
+            const cost = (f ? (g * (f.cost_per_kg / 1000)) : 0) + (hrs * 1.0);
+            const price = cost / (1 - (m / 100));
+            document.getElementById('realCost').innerText = `€${cost.toFixed(2)}`;
+            document.getElementById('suggestedPrice').innerText = `€${price.toFixed(2)}`;
         }
 
-        async function saveAndInvoice() {
-            const name = document.getElementById('calcName').value;
-            const price = document.getElementById('suggestedPrice').innerText.replace('€', '');
-            if(!name || price == "0.00") return alert("Enter Order Name!");
-            
-            await supabaseClient.from('Invoices').insert([{ 
-                client_name: name, 
-                total_amount: parseFloat(price),
-                status: 'Pending'
-            }]);
-            
-            alert("Order Saved to P&L!");
-            showMenu();
+        async function saveCalcOrder() {
+            const n = document.getElementById('calcName').value;
+            const p = document.getElementById('suggestedPrice').innerText.replace('€', '');
+            await supabaseClient.from('Invoices').insert([{ client_name: n, total_amount: parseFloat(p), status: 'Paid' }]);
+            alert("Order Invoiced!"); loadData(); showMenu();
+        }
+
+        async function addFilament() {
+            const n = document.getElementById('filName').value;
+            const c = document.getElementById('filCost').value;
+            await supabaseClient.from('Filaments').insert([{ name: n, cost_per_kg: c }]);
+            loadData();
+        }
+
+        async function addWarehouseItem() {
+            const n = document.getElementById('newProdName').value;
+            const q = document.getElementById('newProdQty').value;
+            await supabaseClient.from('Inventory').insert([{ name: n, stock_g: q }]);
+            loadData();
+        }
+
+        async function logHrs(id) {
+            const h = prompt("Hours?");
+            const { data: p } = await supabaseClient.from('Printers').select('*').eq('id', id).single();
+            await supabaseClient.from('Printers').update({ total_hours: p.total_hours + parseFloat(h), hours_since_service: p.hours_since_service + parseFloat(h) }).eq('id', id);
+            loadData();
+        }
+
+        async function sell(locId, item) {
+            const price = prompt("Price?");
+            const loc = locations.find(l => l.id == locId);
+            let inv = loc.inventory; inv[item] -= 1;
+            await supabaseClient.from('Locations').update({ inventory: inv }).eq('id', locId);
+            await supabaseClient.from('Invoices').insert([{ client_name: `Sale: ${item}`, total_amount: parseFloat(price) }]);
+            loadData();
         }
 
         function openSection(id, title) {
@@ -147,7 +185,7 @@
         function showMenu() {
             document.getElementById('mainMenu').style.display = 'grid';
             document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
-            document.getElementById('appTitle').innerHTML = `WONDERSYNC PRO`;
+            document.getElementById('appTitle').innerHTML = `WONDERSYNC MASTER`;
             document.getElementById('backBtn').style.display = 'none';
         }
 
