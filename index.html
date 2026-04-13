@@ -9,22 +9,25 @@
         .app-header { background: rgba(15, 52, 96, 0.95); padding: 20px; text-align: center; border-bottom: 2px solid var(--main); position: sticky; top: 0; z-index: 1000; }
         .back-btn { position: absolute; left: 20px; top: 18px; font-size: 1.8rem; cursor: pointer; display: none; color: var(--main); }
         
-        /* Dashboard Grid */
+        /* Dashboard */
         .dash-section-title { padding: 15px 15px 5px; font-size: 0.7rem; letter-spacing: 2px; color: var(--main); font-weight: 900; }
         .menu-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding: 15px; }
         .menu-item { background: var(--card); padding: 20px 10px; border-radius: 15px; text-align: center; border: 1px solid rgba(255,255,255,0.05); cursor: pointer; }
-        .menu-item i { font-size: 1.5rem; display: block; margin-bottom: 8px; }
         
         /* Sections */
         .section { display: none; padding: 15px; animation: fadeIn 0.3s ease; }
         .section.active { display: block; }
         .card { background: var(--card); border-radius: 20px; padding: 18px; margin-bottom: 12px; border: 1px solid rgba(255,255,255,0.1); }
         
+        /* Filament UI */
+        .fil-dot { width: 40px; height: 40px; border-radius: 50%; border: 3px solid white; display: inline-block; margin-bottom: 5px; }
+        .fil-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)); gap: 10px; text-align: center; margin-top: 15px; }
+        .fil-item { background: rgba(0,0,0,0.2); padding: 10px; border-radius: 15px; font-size: 0.7rem; }
+
         /* Forms */
         input, select { width: 100%; padding: 14px; border-radius: 12px; border: none; background: var(--input); color: white; margin-bottom: 10px; font-size: 1rem; box-sizing: border-box; }
         label { font-size: 0.65rem; color: var(--main); font-weight: 900; text-transform: uppercase; margin-bottom: 4px; display: block; }
         .btn { background: var(--main); color: white; border: none; padding: 15px; border-radius: 15px; width: 100%; font-weight: 900; cursor: pointer; }
-        .btn-money { background: var(--money); color: black; }
         
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     </style>
@@ -70,28 +73,33 @@
 
     <div id="sec-fil" class="section">
         <div class="card">
-            <label>New Spool Name</label><input type="text" id="fn">
-            <label>Price per kg</label><input type="number" id="fc">
-            <button class="btn" onclick="saveFilament()">Add to Inventory</button>
+            <label>Brand / Name</label><input type="text" id="fn" placeholder="e.g. Elegoo White">
+            <label>Type</label>
+            <select id="ft">
+                <option>PLA</option><option>PETG</option><option>ABS</option><option>TPU</option><option>Resin</option>
+            </select>
+            <label>Spool Color</label>
+            <input type="color" id="fc_hex" value="#ffffff" style="height: 50px; padding: 5px;">
+            <label>Price per kg (€)</label><input type="number" id="fc_price" placeholder="18.50">
+            <button class="btn" onclick="saveFilament()">Add Spool</button>
         </div>
-        <div id="filList"></div>
+        
+        <div class="dash-section-title">ACTIVE SPOOLS</div>
+        <div id="filList" class="fil-grid"></div>
     </div>
 
-    <div id="sec-maint" class="section">
-        <div id="printList"></div>
-    </div>
-
-    <div id="sec-parts" class="section"><div class="card">🔧 Parts tracking coming in next step...</div></div>
-    <div id="sec-ware" class="section"><div class="card">📦 Warehouse stock coming in next step...</div></div>
-    <div id="sec-fran" class="section"><div class="card">🏪 Franchise data coming in next step...</div></div>
-    <div id="sec-pl" class="section"><div class="card">💰 P&L history coming in next step...</div></div>
-    <div id="sec-invest" class="section"><div class="card">🏛️ Investment tracking coming in next step...</div></div>
+    <div id="sec-maint" class="section"><div id="printList"></div></div>
+    <div id="sec-parts" class="section"><div class="card">🔧 Parts tracking...</div></div>
+    <div id="sec-ware" class="section"><div class="card">📦 Warehouse stock...</div></div>
+    <div id="sec-fran" class="section"><div class="card">🏪 Franchise...</div></div>
+    <div id="sec-pl" class="section"><div class="card">💰 P&L...</div></div>
+    <div id="sec-invest" class="section"><div class="card">🏛️ Investment...</div></div>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
         const SUPABASE_URL = 'https://yeiqourfbdormfeprvgq.supabase.co';
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InllaXFvdXJmYmRvcm1mZXBydmdxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU2ODM1NTcsImV4cCI6MjA5MTI1OTU1N30.UWLPlGfNquzDYWow85CEztwpEMM9sgHlEeQLLPjRrdc';
-        const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
         let filaments = [];
 
@@ -100,14 +108,38 @@
             const { data: p } = await supabase.from('Printers').select('*');
             filaments = f || [];
             
-            // Populate Calculator Dropdown
-            document.getElementById('calcFil').innerHTML = filaments.map(x => `<option value="${x.cost_per_kg}">${x.name}</option>`).join('');
+            // Populate Calculator
+            document.getElementById('calcFil').innerHTML = filaments.map(x => `<option value="${x.cost_per_kg}">${x.name} (${x.type})</option>`).join('');
             
-            // Populate Filament List
-            document.getElementById('filList').innerHTML = filaments.map(x => `<div class="card"><b>${x.name}</b>: €${x.cost_per_kg}/kg</div>`).join('');
+            // Render Filament Grid (Elegoo Style)
+            document.getElementById('filList').innerHTML = filaments.map(x => `
+                <div class="fil-item">
+                    <div class="fil-dot" style="background-color: ${x.color_hex || '#fff'}"></div>
+                    <div style="font-weight:bold">${x.type}</div>
+                    <div style="opacity:0.7">${x.name}</div>
+                </div>
+            `).join('');
             
             // Populate Printers
             document.getElementById('printList').innerHTML = (p || []).map(x => `<div class="card"><b>${x.name}</b><br><small>${x.total_hours}h total</small></div>`).join('');
+        }
+
+        async function saveFilament() {
+            const name = document.getElementById('fn').value;
+            const type = document.getElementById('ft').value;
+            const color = document.getElementById('fc_hex').value;
+            const price = document.getElementById('fc_price').value;
+
+            if(!name || !price) return alert("Fill all fields");
+
+            await supabase.from('Filaments').insert([{ 
+                name: name, 
+                type: type, 
+                color_hex: color, 
+                cost_per_kg: price 
+            }]);
+            
+            init();
         }
 
         function runCalc() {
@@ -116,13 +148,6 @@
             const hrs = parseFloat(document.getElementById('calcH').value) || 0;
             const final = (grams * (costPerKg / 1000)) + (hrs * 1.0);
             document.getElementById('res-cost').innerText = `€${final.toFixed(2)}`;
-        }
-
-        async function saveFilament() {
-            const name = document.getElementById('fn').value;
-            const cost = document.getElementById('fc').value;
-            await supabase.from('Filaments').insert([{ name, cost_per_kg: cost }]);
-            init();
         }
 
         function openSection(id, title) {
